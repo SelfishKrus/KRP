@@ -1,6 +1,7 @@
 
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 
 partial class CameraRenderer{
@@ -11,6 +12,8 @@ partial class CameraRenderer{
     partial void DrawUnsupportedShaders();  // signature
 
     partial void PrepareForSceneWindow();
+
+    partial void PrepareBuffer();
 
     #if UNITY_EDITOR
         static ShaderTagId[] legacyShaderTagIds = {
@@ -23,6 +26,8 @@ partial class CameraRenderer{
         };  
 
         static Material errorMat;
+
+        string SampleName { get; set; }
 
         partial void DrawUnsupportedShaders(){
             if (errorMat == null) {
@@ -49,11 +54,28 @@ partial class CameraRenderer{
             }
         }
 
+        // render UI in the scene view
         partial void PrepareForSceneWindow(){
             if (camera.cameraType == CameraType.SceneView) {
                 ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
             }
         }
+
+        // create scopes for different cameras
+        partial void PrepareBuffer(){
+
+            // namely buffer.name = SampleName = camera.name;
+            Profiler.BeginSample("Editor Only");
+            SampleName = camera.name;
+            buffer.name = camera.name;
+            Profiler.EndSample();
+            
+        }
+
+    #else
+
+        const string SampleName = bufferName;
+        
     #endif
 
 }

@@ -3,7 +3,17 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class KrusRenderPipeline : RenderPipeline{
+
+    bool useDynamicBatching, useGPUInstancing;
     
+    public KrusRenderPipeline(
+        bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher
+    ) {
+        this.useDynamicBatching = useDynamicBatching;
+        this.useGPUInstancing = useGPUInstancing;
+        GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+    }
+
     CameraRenderer renderer = new CameraRenderer();
 
     // evoked per frame
@@ -11,9 +21,7 @@ public class KrusRenderPipeline : RenderPipeline{
     //           about the current rendering pass
     protected override void Render(ScriptableRenderContext context, Camera[] cameras) {
         foreach (Camera camera in cameras) {
-            renderer.Render(context, camera);
+            renderer.Render(context, camera, useDynamicBatching, useGPUInstancing);
         }
-    }
-
-    
+    }    
 }

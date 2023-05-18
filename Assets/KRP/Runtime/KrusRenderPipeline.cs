@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
+
 public class KrusRenderPipeline : RenderPipeline{
 
     bool useDynamicBatching, useGPUInstancing;
@@ -12,6 +13,7 @@ public class KrusRenderPipeline : RenderPipeline{
         this.useDynamicBatching = useDynamicBatching;
         this.useGPUInstancing = useGPUInstancing;
         GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+        GraphicsSettings.lightsUseLinearIntensity = true;
     }
 
     CameraRenderer renderer = new CameraRenderer();

@@ -5,7 +5,12 @@ using UnityEngine.Rendering;
 public partial class CameraRenderer{
     ScriptableRenderContext context;
     Camera camera;
+    Lighting lighting = new Lighting();
+
+    CullingResults cullingResults; // store the result of culling
+    const string bufferName = "Render Camera";
     
+    // MAIN FUNCTION // 
     public void Render (
         ScriptableRenderContext context, Camera camera,
         bool useDynamicBatching, bool useGPUInstancing
@@ -20,19 +25,23 @@ public partial class CameraRenderer{
         }
 
         Setup(); 
+        lighting.Setup(context, cullingResults);
         DrawUnsupportedShaders();
         DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);  
         DrawGizmos();
         Submit();  
     }
 
-    CullingResults cullingResults; // store the result of culling
-    const string bufferName = "Render Camera";
+
+
     CommandBuffer buffer = new CommandBuffer {
         name = bufferName
     };
 
-    static ShaderTagId unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+    static ShaderTagId 
+        unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit"),
+        litShaderTagId = new ShaderTagId("KRPLit");
+    
 
     // to check if the camera is setting up correctly
     // correct - cull the scene
@@ -66,6 +75,7 @@ public partial class CameraRenderer{
             enableInstancing = useGPUInstancing
         };
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque); // allow all
+        drawingSettings.SetShaderPassName(1, litShaderTagId);
 
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
         context.DrawSkybox(camera);

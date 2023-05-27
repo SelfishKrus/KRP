@@ -72,21 +72,31 @@
         PbrSurface pbrSurface;
         SetupSurface(input, pbrSurface);
         PbrVectors pbrVectors;
-        SetupVectors(input, pbrVectors);
+        SetupVectors(input, pbrVectors, 0);
 
-        DirectionalLight mainLight = GetDirectionalLight(0);
-        
+        half3 directCol;
+        half3 indirectCol;
+
         // === DIRECT LIGHT === //
         half3 F_DL = GetF_SL(pbrSurface.F0, pbrVectors.hv, pbrSurface.roughness);
         // Specular - Cook-Torrance BRDF //
         half3 BRDF = GetBRDF_CookTorrance(pbrSurface, pbrVectors, F_DL);
-        half3 specCol_DL = BRDF * mainLight.color * pbrVectors.nl * PI;   // to compensate for PI igonred in diffuse part      
         // Diffuse - Lambert // 
         half3 k_d_DL = (1 - F_DL) * (1 - pbrSurface.metallic);
-        half3 diffCol_DL = k_d_DL * pbrSurface.baseCol * mainLight.color * pbrVectors.nl;
-        // Color from Direct Light // 
-        half3 directCol = diffCol_DL + specCol_DL;
 
+        for (int i = 0; i < GetDirectionalLightCount(); i++) {
+
+            SetupVectors(input, pbrVectors, i);
+            DirectionalLight mainLight = GetDirectionalLight(i);
+            half3 specCol_DL = BRDF * mainLight.color * pbrVectors.nl * PI;   // to compensate for PI igonred in diffuse part      
+            half3 diffCol_DL = k_d_DL * pbrSurface.baseCol * mainLight.color * pbrVectors.nl;
+            // Color from Direct Light // 
+            directCol += diffCol_DL + specCol_DL;
+
+        }
+
+
+        /*
         // === INDIRECT LIGHT === //
         // Specular //
         // Li - IBL 
@@ -103,9 +113,10 @@
         half3 diffCol_IDL = SHCol * k_d_IDL * pbrSurface.baseCol;
         // Color from Indirect Light // 
         half3 indirectCol = specCol_IDL + diffCol_IDL;
+        */
 
         // === FINAL COLOR === //
-        half3 col = directCol + indirectCol;
+        half3 col = directCol * pbrSurface.AO;
 
         return half4(col, pbrSurface.alpha);
     }

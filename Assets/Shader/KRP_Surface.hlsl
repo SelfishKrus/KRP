@@ -50,7 +50,7 @@
         return;
     }
 
-    void SetupVectors(Varyings i, inout PbrVectors pbrVectors) {
+    void SetupVectors(Varyings i, inout PbrVectors pbrVectors, int lightIndex) {
 
         float3 posWS = float3(i.TBN0.w, i.TBN1.w, i.TBN2.w);
 
@@ -58,7 +58,7 @@
         half3 normalTS = UnpackNormalScale(normalCol, _NormalScale);
         half3 normalWS = normalize(half3(dot(i.TBN0.xyz, normalTS), dot(i.TBN1.xyz, normalTS), dot(i.TBN2.xyz, normalTS)));
 
-        DirectionalLight mainLight = GetDirectionalLight(0);
+        DirectionalLight mainLight = GetDirectionalLight(lightIndex);
 
         pbrVectors.nTS = normalTS;
         pbrVectors.n = normalWS;

@@ -9,12 +9,19 @@ Shader "KRP/Lit"
         [Enum(Off, 0, On, 1)] _ZWrite ("ZWrite", Float) = 1
         [Toggle(_CLIPPING)] _Clipping ("Alpha Clipping", Float) = 1
 
-        _Metallic ("Metallic", Range(0, 1)) = 0
-        _Smoothness ("Smoothness", Range(0, 1)) = 0.5
+        _Tint ("Tint", Color) = (1,1,1,1)
+        _BaseTex ("Base Color", 2D) = "" {}
+        _NormalTex ("Normal Map", 2D) = "normal" {}
+        _NormalScale ("Normal Scale", Range(0, 3)) = 1.0
+        _MetallicTex ("Metallic Map", 2D) = "black" {}
+        _RoughnessTex ("Roughness Map", 2D) = "white" {}
+        _RoughnessScale ("Roughness Scale", Range(0, 1)) = 1.0
+        _AOTex ("AO Map", 2D) = "white" {}
+        _AOScale ("AO Scale", Range(0, 3)) = 1.0
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" "RenderPipeline"="UniversalRenderPipeline" "Queue"="Transparent" "IgnoreProjector"="True"}
+        Tags { "RenderType"="Opaque" "RenderPipeline"="UniversalRenderPipeline" "Queue"="Geometry" "IgnoreProjector"="True"}
         LOD 100
 
         Pass

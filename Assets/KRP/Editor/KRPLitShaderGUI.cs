@@ -53,7 +53,7 @@ public class KRPLitShaderGUI : ShaderGUI {
 		set => SetProperty("_Clipping", "_CLIPPING", value);
 	}
 	bool PremultiplyAlpha {
-		set => SetProperty("_PremulAlpha", "_PREMULTIPLY_ALPHA", value);
+		set => SetProperty("_PremultiplyAlpha", "_PREMULTIPLY_ALPHA", value);
 	}
 	BlendMode SrcBlend {
 		set => SetProperty("_SrcBlend", (float)value);

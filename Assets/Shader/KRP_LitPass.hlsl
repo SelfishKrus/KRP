@@ -32,6 +32,7 @@
     half _RoughnessScale;
     float _AOScale;
     float4 _Tint;
+    half _Cutoff;
 
     float _TestFactor;
     
@@ -71,6 +72,11 @@
         // === PREPARATION === //
         PbrSurface pbrSurface;
         SetupSurface(input, pbrSurface);
+
+        #ifdef _CLIPPING
+            clip(pbrSurface.alpha - _Cutoff);
+        #endif
+        
         PbrVectors pbrVectors;
         SetupVectors(input, pbrVectors, 0);
 
@@ -90,6 +96,9 @@
             DirectionalLight mainLight = GetDirectionalLight(i);
             half3 specCol_DL = BRDF * mainLight.color * pbrVectors.nl * PI;   // to compensate for PI igonred in diffuse part      
             half3 diffCol_DL = k_d_DL * pbrSurface.baseCol * mainLight.color * pbrVectors.nl;
+            #ifdef _PREMULTIPLY_ALPHA
+                diffCol_DL *= pbrSurface.alpha;
+            #endif
             // Color from Direct Light // 
             directCol += diffCol_DL + specCol_DL;
 

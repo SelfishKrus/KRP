@@ -38,7 +38,7 @@
         pbrSurface.AO = pow(pbrSurface.AO, _AOScale);
         pbrSurface.tempRoughness = tex2D(_RoughnessTex, i.uv).r;
         pbrSurface.tempRoughness = (pbrSurface.tempRoughness+_RoughnessScale) / (1+_RoughnessScale);
-        pbrSurface.roughness = pow(pbrSurface.tempRoughness, 2);
+        pbrSurface.roughness = pbrSurface.tempRoughness * pbrSurface.tempRoughness;
         pbrSurface.smoothness = 1 - pbrSurface.tempRoughness;
         
         half4 texCol = tex2D(_BaseTex, i.uv);

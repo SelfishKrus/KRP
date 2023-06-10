@@ -13,19 +13,20 @@ public partial class CameraRenderer{
     // MAIN FUNCTION // 
     public void Render (
         ScriptableRenderContext context, Camera camera,
-        bool useDynamicBatching, bool useGPUInstancing
+        bool useDynamicBatching, bool useGPUInstancing,
+        ShadowSettings shadowSettings
     ) {
         this.context = context;
         this.camera = camera;
 
         PrepareBuffer();
         PrepareForSceneWindow();
-        if (!Cull()) {
+        if (!Cull(shadowSettings.maxDistance)) {
             return;
         }
 
         Setup(); 
-        lighting.Setup(context, cullingResults);
+        lighting.Setup(context, cullingResults, shadowSettings);
         DrawUnsupportedShaders();
         DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);  
         DrawGizmos();
@@ -46,8 +47,9 @@ public partial class CameraRenderer{
     // to check if the camera is setting up correctly
     // correct - cull the scene
     // incorrect - skip rendering
-    bool Cull() {
+    bool Cull(float maxShadowDistance) {
         if (camera.TryGetCullingParameters(out ScriptableCullingParameters p)) {
+            p.shadowDistance = maxShadowDistance;
             cullingResults = context.Cull(ref p); // cull the scene
             return true;
         }

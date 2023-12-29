@@ -4,7 +4,12 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class KrusRenderPipeline : RenderPipeline
-{
+{   
+    public KrusRenderPipeline()
+    {
+        GraphicsSettings.useScriptableRenderPipelineBatching = true;
+    }
+
     CameraRenderer renderer = new CameraRenderer();
 
 	protected override void Render (ScriptableRenderContext context, Camera[] cameras) 

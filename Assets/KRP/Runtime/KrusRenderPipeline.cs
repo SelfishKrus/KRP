@@ -5,24 +5,28 @@ using UnityEngine.Rendering;
 
 public class KrusRenderPipeline : RenderPipeline
 {   
-    public KrusRenderPipeline()
-    {
-        GraphicsSettings.useScriptableRenderPipelineBatching = true;
+    bool useDynamicBatching, useGPUInstancing, useSRPBatcher;
+
+    public KrusRenderPipeline
+    (
+        bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher
+    )
+    {   
+        this.useDynamicBatching = useDynamicBatching;
+        this.useGPUInstancing = useGPUInstancing;
+        GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+        GraphicsSettings.lightsUseLinearIntensity = true;
     }
 
     CameraRenderer renderer = new CameraRenderer();
+    
 
 	protected override void Render (ScriptableRenderContext context, Camera[] cameras) 
     {   
         // Loop through all cameras and render images
         for (int i = 0; i < cameras.Length; i++)
         {
-            renderer.Render(context, cameras[i]);
+            renderer.Render(context, cameras[i], useDynamicBatching, useGPUInstancing);
         }
     }
-
-	protected RenderPipeline CreatePipeline() 
-    {
-		return new KrusRenderPipeline();
-	}
 }

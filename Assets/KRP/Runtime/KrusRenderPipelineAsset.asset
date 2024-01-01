@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96dad178f23c8dd468b39af79be87b76, type: 3}
   m_Name: KrusRenderPipelineAsset
   m_EditorClassIdentifier: 
-  useDynamicBatching: 0
+  useDynamicBatching: 1
   useGPUInstancing: 1
-  useSRPBatcher: 0
+  useSRPBatcher: 1

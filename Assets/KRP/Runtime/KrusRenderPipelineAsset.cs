@@ -9,8 +9,11 @@ public class KrusRenderPipelineAsset : RenderPipelineAsset
     [SerializeField]
     bool useDynamicBatching = true, useGPUInstancing = true, useSRPBatcher = true;
 
+    [SerializeField]
+    ShadowSettings shadowSettings = default;
+
     protected override RenderPipeline CreatePipeline()
     {
-        return new KrusRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher);
+        return new KrusRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher, shadowSettings);
     }
 }

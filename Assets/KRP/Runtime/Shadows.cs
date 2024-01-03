@@ -28,8 +28,8 @@ public class Shadows
     int shadowedDirectionalLightCount;
 
     static int 
-        dirShadowAtlasId = Shader.PropertyToID("_DirectionalShadowAtlas"),
-        dirShadowMatricesId = Shader.PropertyToID("_DirectionalShadowMatrices");
+        dirShadowAtlasId = Shader.PropertyToID("_DL_ShadowAtlas"),
+        dirShadowMatricesId = Shader.PropertyToID("_DL_ShadowMatrices");
 
     static Matrix4x4[] dirShadowMatrices = new Matrix4x4[maxShadowedDirectionalLightCount];
     
@@ -53,19 +53,21 @@ public class Shadows
     ShadowedDirectionalLight[] shadowedDirectionalLights = 
         new ShadowedDirectionalLight[maxShadowedDirectionalLightCount];
 
-    public void ReserveDirectionalShadows (Light light, int visibleLightIndex) 
+    public Vector2 ReserveDirectionalShadows (Light light, int visibleLightIndex) 
     {
         if (shadowedDirectionalLightCount < maxShadowedDirectionalLightCount && 
             light.shadows != LightShadows.None && 
             light.shadowStrength > 0f &&
             cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
         {
-                shadowedDirectionalLights[shadowedDirectionalLightCount++] =
-                    new ShadowedDirectionalLight 
-                    {
-                        visibleLightIndex = visibleLightIndex
-                    };
+            shadowedDirectionalLights[shadowedDirectionalLightCount] = new ShadowedDirectionalLight 
+                {
+                    visibleLightIndex = visibleLightIndex
+                };
+            return new Vector2(light.shadowStrength, shadowedDirectionalLightCount++);   
         }
+        return Vector2.zero;
+
     }
 
     Vector2 SetTileViewport (int index, int split, float tileSize) 
@@ -96,6 +98,10 @@ public class Shadows
 		m.m11 = (0.5f * (m.m11 + m.m31) + offset.y * m.m31) * scale;
 		m.m12 = (0.5f * (m.m12 + m.m32) + offset.y * m.m32) * scale;
 		m.m13 = (0.5f * (m.m13 + m.m33) + offset.y * m.m33) * scale;
+		m.m20 = 0.5f * (m.m20 + m.m30);
+		m.m21 = 0.5f * (m.m21 + m.m31);
+		m.m22 = 0.5f * (m.m22 + m.m32);
+		m.m23 = 0.5f * (m.m23 + m.m33);
         return m;
     }
 

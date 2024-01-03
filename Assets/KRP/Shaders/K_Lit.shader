@@ -37,6 +37,7 @@ Shader "KRP/K_Lit"
 
             #include "../ShaderLibrary/K_Common.hlsl"
             #include "../ShaderLibrary/K_Surface.hlsl"
+            #include "../ShaderLibrary/K_Shadows.hlsl"
             #include "../ShaderLibrary/K_Light.hlsl"
             #include "../ShaderLibrary/K_BRDF.hlsl"
             #include "../ShaderLibrary/K_Lighting.hlsl"
@@ -95,6 +96,7 @@ Shader "KRP/K_Lit"
                 #endif
 
                 Surface surface;
+                surface.position = i.posWS;
                 surface.normal = normalize(i.normalWS);
                 surface.color = col;
                 surface.alpha = baseMap.a;

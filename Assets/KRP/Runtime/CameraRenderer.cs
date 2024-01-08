@@ -35,6 +35,7 @@ public partial class CameraRenderer
 
         PrepareBuffer();
         PrepareForSceneWindow();
+        // Return if Cull() fails
         if (!Cull(shadowSettings.maxDistance)) return;
 
         buffer.BeginSample(SampleName);
@@ -63,7 +64,6 @@ public partial class CameraRenderer
             flags == CameraClearFlags.Color ? camera.backgroundColor.linear : Color.clear);
         buffer.BeginSample(SampleName);
         ExecuteBuffer();
-
     }
 
     void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing)

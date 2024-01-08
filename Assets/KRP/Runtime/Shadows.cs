@@ -1,3 +1,4 @@
+// using System.Numerics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -24,14 +25,18 @@ public class Shadows
 
     ShadowSettings shadowSettings;
 
-    const int maxShadowedDirectionalLightCount = 4;
+    const int maxShadowedDirectionalLightCount = 4, maxCascades = 4;
     int shadowedDirectionalLightCount;
 
     static int 
         dirShadowAtlasId = Shader.PropertyToID("_DL_ShadowAtlas"),
-        dirShadowMatricesId = Shader.PropertyToID("_DL_ShadowMatrices");
+        dirShadowMatricesId = Shader.PropertyToID("_DL_ShadowMatrices"),
+        cascadeCountId = Shader.PropertyToID("_CascadeCount"),
+        cascadeCullingSpheresId = Shader.PropertyToID("_CascadeCullingSpheres");
 
-    static Matrix4x4[] dirShadowMatrices = new Matrix4x4[maxShadowedDirectionalLightCount];
+    static Vector4[] cascadeCullingSpheres = new Vector4[maxCascades];
+
+    static Matrix4x4[] dirShadowMatrices = new Matrix4x4[maxShadowedDirectionalLightCount * maxCascades];
     
 
     public void Setup(
@@ -64,7 +69,9 @@ public class Shadows
                 {
                     visibleLightIndex = visibleLightIndex
                 };
-            return new Vector2(light.shadowStrength, shadowedDirectionalLightCount++);   
+            return new Vector2(
+                light.shadowStrength, 
+                shadowSettings.directional.cascadeCount * shadowedDirectionalLightCount++);   
         }
         return Vector2.zero;
 
@@ -108,21 +115,37 @@ public class Shadows
     void RenderDirectionalShadows (int index, int split, int tileSize)
     {
         ShadowedDirectionalLight light = shadowedDirectionalLights[index];
-		var shadowSettings = new ShadowDrawingSettings(
+		var _shadowSettings = new ShadowDrawingSettings(
             cullingResults, 
             light.visibleLightIndex);
-        cullingResults.ComputeDirectionalShadowMatricesAndCullingPrimitives(
-			light.visibleLightIndex, 0, 1, Vector3.zero, tileSize, 0f,
-			out Matrix4x4 viewMatrix, out Matrix4x4 projectionMatrix,
-			out ShadowSplitData splitData);
-        shadowSettings.splitData = splitData;
-        dirShadowMatrices[index] = ConvertToAtlasMatrix(
-            projectionMatrix * viewMatrix, 
-            SetTileViewport(index, split, tileSize), 
-            split);
-		buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
-        ExecuteBuffer();
-        context.DrawShadows(ref shadowSettings);
+        int cascadeCount = shadowSettings.directional.cascadeCount;
+        int tileOffset = index * cascadeCount;
+        Vector3 ratios = shadowSettings.directional.CascadeRatios;
+
+        for (int i = 0; i < cascadeCount; i++)
+        {
+            cullingResults.ComputeDirectionalShadowMatricesAndCullingPrimitives(
+                light.visibleLightIndex, i, cascadeCount, ratios, tileSize, 0f,
+                out Matrix4x4 viewMatrix, out Matrix4x4 projectionMatrix,
+                out ShadowSplitData splitData);
+            _shadowSettings.splitData = splitData;
+            // only needed for the first light as the cascades of all lights are equivalent
+            if (index == 0) 
+            {   
+                // Squared distance
+                Vector4 cullingSphere = splitData.cullingSphere;
+                cullingSphere.w *= cullingSphere.w;
+                cascadeCullingSpheres[i] = cullingSphere;
+            }
+            int tileIndex = tileOffset + i;
+            dirShadowMatrices[tileIndex] = ConvertToAtlasMatrix(
+                projectionMatrix * viewMatrix, 
+                SetTileViewport(tileIndex, split, tileSize), 
+                split);
+            buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
+            ExecuteBuffer();
+            context.DrawShadows(ref _shadowSettings);
+        }
     }
 
     void RenderDirectionalShadows()
@@ -136,7 +159,8 @@ public class Shadows
         buffer.BeginSample(bufferName);
         ExecuteBuffer();
 
-        int split = shadowedDirectionalLightCount <= 1 ? 1 : 2;
+        int tiles = shadowedDirectionalLightCount * shadowSettings.directional.cascadeCount;
+        int split = tiles <= 1 ? 1 : tiles <= 4 ? 2 : 4;
         int tileSize = atlasSize / split;
 
         for (int i = 0; i < shadowedDirectionalLightCount; i++) 

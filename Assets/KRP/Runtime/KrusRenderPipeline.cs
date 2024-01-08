@@ -22,7 +22,6 @@ public class KrusRenderPipeline : RenderPipeline
 
     CameraRenderer renderer = new CameraRenderer();
     
-
 	protected override void Render (ScriptableRenderContext context, Camera[] cameras) 
     {   
         // Loop through all cameras and render images

@@ -18,10 +18,12 @@
 
     float3 GetLighting (Surface surfaceWS)
     {   
+        ShadowData shadowData = GetShadowData(surfaceWS);
         float3 color = 0.0;
         for (int i = 0; i < GetDirectionalLightCount(); i++)
         {   
-            color += GetLighting(surfaceWS, GetDirectionalLight(i, surfaceWS));
+            Light light = GetDirectionalLight(i, surfaceWS, shadowData);
+            color += GetLighting(surfaceWS, GetDirectionalLight(i, surfaceWS, shadowData));
         }
         return color;
     }

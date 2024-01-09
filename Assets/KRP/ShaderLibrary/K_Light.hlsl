@@ -19,21 +19,21 @@ struct Light
     float attenuation;
 };
 
-DL_ShadowData GetDirectionalShadowData(int index)
+DL_ShadowData GetDirectionalShadowData(int lightIndex, ShadowData shadowData)
 {
     DL_ShadowData data;
-    data.strength = _DL_ShadowData[index].x;
-    data.tileIndex = _DL_ShadowData[index].y;
+    data.strength = _DL_ShadowData[lightIndex].x * shadowData.strength;
+    data.tileIndex = _DL_ShadowData[lightIndex].y + shadowData.cascadeIndex;
     return data;
 }
 
-Light GetDirectionalLight(int index, Surface surfaceWS)
+Light GetDirectionalLight(int index, Surface surfaceWS, ShadowData shadowData)
 {
     Light light;
     light.color = _DL_Colors[index].rgb;
     light.direction = _DL_Directions[index].xyz;
-    DL_ShadowData shadowData = GetDirectionalShadowData(index);
-    light.attenuation = GetDirectionalShadowAttenuation(shadowData, surfaceWS);
+    DL_ShadowData dl_shadowData = GetDirectionalShadowData(index, shadowData);
+    light.attenuation = GetDirectionalShadowAttenuation(dl_shadowData, surfaceWS);
     return light;
 }
 

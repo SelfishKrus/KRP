@@ -167,7 +167,8 @@ public class Shadows
         {
 			RenderDirectionalShadows(i, split, tileSize);
 		}
-		
+		buffer.SetGlobalInt(cascadeCountId, shadowSettings.directional.cascadeCount);
+        buffer.SetGlobalVectorArray(cascadeCullingSpheresId, cascadeCullingSpheres);
         buffer.SetGlobalMatrixArray(dirShadowMatricesId, dirShadowMatrices);
 		buffer.EndSample(bufferName);
 		ExecuteBuffer();

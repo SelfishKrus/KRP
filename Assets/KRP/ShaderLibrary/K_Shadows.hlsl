@@ -12,6 +12,7 @@ CBUFFER_START(_K_Shadows)
     int _CascadeCount;
     float4 _CascadeCullingSpheres[MAX_CASCADE_COUNT];
     float4x4 _DL_ShadowMatrices[MAX_SHADOWED_DIRECTIONAL_LIGHT_COUNT * MAX_CASCADE_COUNT];
+    float _ShadowDistance;
 CBUFFER_END
 
 struct DL_ShadowData
@@ -45,7 +46,11 @@ struct ShadowData
 ShadowData GetShadowData (Surface surfaceWS)
 {
     ShadowData data;
+<<<<<<< HEAD
+    data.strength = surfaceWS.depth < _ShadowDistance ? 1.0 : 0.0;
+=======
     data.strength = 1.0;
+>>>>>>> main_revision
     int i;
     for (i = 0; i < _CascadeCount; i++)
     {

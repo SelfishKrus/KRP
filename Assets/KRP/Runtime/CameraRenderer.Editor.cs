@@ -27,7 +27,7 @@ namespace KRP
         new ShaderTagId("Vertex"),
         new ShaderTagId("VertexLMRGBM"),
         new ShaderTagId("VertexLM")
-    };
+        };
 
         static Material errorMaterial;
 

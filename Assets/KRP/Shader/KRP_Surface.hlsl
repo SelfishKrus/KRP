@@ -1,5 +1,5 @@
-#ifndef K_SURFACE_INCLUDED
-#define K_SURFACE_INCLUDED
+#ifndef KRP_SURFACE_INCLUDED
+#define KRP_SURFACE_INCLUDED
 
 struct Surface 
 {

@@ -1,8 +1,8 @@
-#ifndef K_COMMON_INCLUDED
-#define K_COMMON_INCLUDED
+#ifndef KRP_COMMON_INCLUDED
+#define KRP_COMMON_INCLUDED
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-    #include "K_UnityInput.hlsl"
+    #include "KRP_UnityInput.hlsl"
 
     #define UNITY_MATRIX_M unity_ObjectToWorld
     #define UNITY_MATRIX_I_M unity_WorldToObject

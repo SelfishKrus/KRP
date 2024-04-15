@@ -1,5 +1,5 @@
-#ifndef K_UNITY_INPUT_INCLUDED
-#define K_UNITY_INPUT_INCLUDED
+#ifndef KRP_UNITY_INPUT_INCLUDED
+#define KRP_UNITY_INPUT_INCLUDED
 
 	CBUFFER_START(UnityPerDraw)
 		float4x4 unity_ObjectToWorld;

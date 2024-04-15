@@ -1,5 +1,5 @@
-#ifndef K_BRDF_INCLUDED
-#define K_BRDF_INCLUDED
+#ifndef KRP_BRDF_INCLUDED
+#define KRP_BRDF_INCLUDED
 
 	struct BRDF
 	{

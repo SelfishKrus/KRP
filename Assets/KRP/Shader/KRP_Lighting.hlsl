@@ -1,9 +1,9 @@
-#ifndef K_LIGHTING_INCLUDED
-#define K_LIGHTING_INCLUDED
+#ifndef KRP_LIGHTING_INCLUDED
+#define KRP_LIGHTING_INCLUDED
 
-    #include "K_Surface.hlsl"
-    #include "K_Light.hlsl"
-    #include "K_BRDF.hlsl"
+    #include "KRP_Surface.hlsl"
+    #include "KRP_Light.hlsl"
+    #include "KRP_BRDF.hlsl"
 
     float3 IncomingLighting (Surface surface, Light light)
     {

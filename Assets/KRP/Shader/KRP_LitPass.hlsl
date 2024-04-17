@@ -1,6 +1,13 @@
 ﻿#ifndef KRP_LIT_PASS_INCLUDED
 #define KRP_LIT_PASS_INCLUDED
 
+    #include "KRP_Common.hlsl"
+    #include "KRP_Surface.hlsl"
+    #include "KRP_Shadows.hlsl"
+    #include "KRP_Light.hlsl"
+    #include "KRP_BRDF.hlsl"
+    #include "KRP_Lighting.hlsl"
+
     TEXTURE2D(_BaseMap);    SAMPLER(sampler_BaseMap);
 
     UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
@@ -29,7 +36,7 @@
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
-    Varyings vert (Attributes i)
+    Varyings LitPassVertex (Attributes i)
     {   
         Varyings o;
         UNITY_SETUP_INSTANCE_ID(i);
@@ -42,7 +49,7 @@
         return o;
     }
 
-    half4 frag (Varyings i) : SV_Target
+    half4 LitPassFragment (Varyings i) : SV_Target
     {   
         UNITY_SETUP_INSTANCE_ID(i);
 
@@ -55,6 +62,7 @@
         #endif
 
         Surface surface;
+        surface.position = i.posWS;
         surface.normal = normalize(i.normalWS);
         surface.color = col;
         surface.alpha = baseMap.a;

@@ -32,14 +32,8 @@ Shader "KRP/Lit"
             #pragma multi_compile_instancing
             #pragma shader_feature _ _CLIPPING
             #pragma shader_feature _ _PREMULTIPLY_ALPHA
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "KRP_Common.hlsl"
-            #include "KRP_Surface.hlsl"
-            #include "KRP_Light.hlsl"
-            #include "KRP_BRDF.hlsl"
-            #include "KRP_Lighting.hlsl"
+            #pragma vertex LitPassVertex
+            #pragma fragment LitPassFragment
 
             #include "KRP_LitPass.hlsl"
 

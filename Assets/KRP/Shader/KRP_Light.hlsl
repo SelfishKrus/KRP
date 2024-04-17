@@ -1,6 +1,7 @@
 #ifndef KRP_LIGHT_INCLUDED
 #define KRP_LIGHT_INCLUDED
 
+    #include "KRP_Shadows.hlsl"
 
     #define MAX_DIRECTIONAL_LIGHT_COUNT 4
 
@@ -19,21 +20,22 @@
         float attenuation;
     };
 
-    DirectionalShadowData GetDirectionalShadowData (int lightIndex)
+    DirectionalShadowData GetDirectionalShadowData (int lightIndex, ShadowData shadowData)
     {
         DirectionalShadowData data;
-        data.strength = _DL_ShadowData[lightIndex].x;
-        data.tileIndex = _DL_ShadowData[lightIndex].y;
+        data.strength = _DL_ShadowData[lightIndex].x * shadowData.strength;
+        data.tileIndex = _DL_ShadowData[lightIndex].y + shadowData.cascadeIndex;
         return data;
     }
 
-    Light GetDirectionalLight(int index, Surface surfaceWS)
+    Light GetDirectionalLight(int index, Surface surfaceWS, ShadowData shadowData)
     {
         Light light;
         light.color = _DL_Colors[index].rgb;
         light.direction = _DL_Directions[index].xyz;
-        DirectionalShadowData shadowData = GetDirectionalShadowData(index);
-        light.attenuation = GetDirectionalShadowAttenuation(shadowData, surfaceWS);
+        DirectionalShadowData dirShadowData = GetDirectionalShadowData(index, shadowData);
+        light.attenuation = GetDirectionalShadowAttenuation(dirShadowData, surfaceWS);
+        //light.attenuation = shadowData.cascadeIndex * 0.25f;
         return light;
     }
 

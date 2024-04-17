@@ -69,6 +69,7 @@
         surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
         surface.smoothness = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Smoothness);
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);
+        surface.depth = -TransformWorldToView(i.posWS).z;
 
         col = GetLighting(surface);
 

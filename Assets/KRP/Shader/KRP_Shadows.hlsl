@@ -9,8 +9,35 @@
 	SAMPLER_CMP(SHADOW_SAMPLER);
 
 	CBUFFER_START(KRP_Shadows)
+		int _CascadeCount;
+		float4 _CascadeCullingSpheres[MAX_CASCADE_COUNT];
 		float4x4 _DirectionalShadowMatrices[MAX_SHADOWED_DIRECTIONAL_LIGHT_COUNT * MAX_CASCADE_COUNT];
+		float _ShadowDistance;
 	CBUFFER_END
+
+	struct ShadowData
+	{
+		int cascadeIndex;
+		float strength;
+	};
+
+	ShadowData GetShadowData (Surface surfaceWS) 
+	{
+		ShadowData data;
+		data.strength = surfaceWS.depth < _ShadowDistance ? 1.0f : 0.0f;
+		int i;
+		for (i = 0; i < _CascadeCount; i++) 
+		{
+			float4 sphere = _CascadeCullingSpheres[i];
+			float distanceSqr = DistanceSquared(surfaceWS.position, sphere.xyz);
+			if (distanceSqr < sphere.w) break;
+		}
+
+		if (i == _CascadeCount) data.strength = 0.0f;
+
+		data.cascadeIndex = i;
+		return data;
+	}
 
 	struct DirectionalShadowData
     {

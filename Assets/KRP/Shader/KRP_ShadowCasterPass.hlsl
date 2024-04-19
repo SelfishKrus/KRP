@@ -34,6 +34,15 @@
         UNITY_TRANSFER_INSTANCE_ID(i, o);
         float3 posWS = TransformObjectToWorld(i.posOS.xyz);
         o.posCS = TransformWorldToHClip(posWS.xyz);
+
+        #if UNITY_REVERSED_Z
+		    o.posCS.z =
+			    min(o.posCS.z, o.posCS.w * UNITY_NEAR_CLIP_VALUE);
+	    #else
+		    output.posCS.z =
+			    max(o.posCS.z, o.posCS.w * UNITY_NEAR_CLIP_VALUE);
+	    #endif
+
         float4 baseMapST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
         o.uv = i.uv * baseMapST.xy + baseMapST.zw;
         return o;

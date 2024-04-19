@@ -22,6 +22,7 @@ public class Shadows
     {
         public int visibleLightIndex;
         public float slopeScaleBias;
+        public float nearPlaneOffset;
     }
     ShadowedDirectionalLight[] ShadowedDirectionalLights = new ShadowedDirectionalLight[maxShadowedDirectionalLightCount];
 
@@ -50,7 +51,8 @@ public class Shadows
             ShadowedDirectionalLights[ShadowedDirectionalLightCount] = 
                 new ShadowedDirectionalLight {
                     visibleLightIndex = visibleLightIndex,
-                    slopeScaleBias = light.shadowBias
+                    slopeScaleBias = light.shadowBias,
+                    nearPlaneOffset = light.shadowNearPlane
                 };
             return new Vector3(
                 light.shadowStrength,
@@ -216,7 +218,7 @@ public class Shadows
 
             cullingResults.ComputeDirectionalShadowMatricesAndCullingPrimitives(
                 light.visibleLightIndex, i, cascadeCount, ratios,
-                tileSize, 0.0f, out Matrix4x4 viewMatrix,
+                tileSize, light.nearPlaneOffset, out Matrix4x4 viewMatrix,
                 out Matrix4x4 projectionMatrix, out ShadowSplitData splitData
             );
 

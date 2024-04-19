@@ -25,6 +25,7 @@
         DirectionalShadowData data;
         data.strength = _DL_ShadowData[lightIndex].x * shadowData.strength;
         data.tileIndex = _DL_ShadowData[lightIndex].y + shadowData.cascadeIndex;
+        data.normalBias = _DL_ShadowData[lightIndex].z;
         return data;
     }
 
@@ -34,7 +35,7 @@
         light.color = _DL_Colors[index].rgb;
         light.direction = _DL_Directions[index].xyz;
         DirectionalShadowData dirShadowData = GetDirectionalShadowData(index, shadowData);
-        light.attenuation = GetDirectionalShadowAttenuation(dirShadowData, surfaceWS);
+        light.attenuation = GetDirectionalShadowAttenuation(dirShadowData, shadowData, surfaceWS);
         //light.attenuation = shadowData.cascadeIndex * 0.25f;
         return light;
     }

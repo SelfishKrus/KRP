@@ -21,6 +21,7 @@ public class Shadows
     struct ShadowedDirectionalLight
     {
         public int visibleLightIndex;
+        public float slopeScaleBias;
     }
     ShadowedDirectionalLight[] ShadowedDirectionalLights = new ShadowedDirectionalLight[maxShadowedDirectionalLightCount];
 
@@ -29,25 +30,36 @@ public class Shadows
         dirShadowMatricesId = Shader.PropertyToID("_DirectionalShadowMatrices"),
         cascadeCountId = Shader.PropertyToID("_CascadeCount"),
         cascadeCullingSpheresId = Shader.PropertyToID("_CascadeCullingSpheres"),
+        cascadeDataId = Shader.PropertyToID("_CascadeData"),
         shadowDistanceFadeId = Shader.PropertyToID("_ShadowDistanceFade");
 
-    static Vector4[] cascadeCullingSpheres = new Vector4[maxCascades];
+    static Vector4[] 
+        cascadeCullingSpheres = new Vector4[maxCascades],
+        cascadeData = new Vector4[maxCascades];
 
     static Matrix4x4[]
         dirShadowMatrices = new Matrix4x4[maxShadowedDirectionalLightCount * maxCascades];
 
-    public Vector2 ReserveDirectionalShadows(Light light, int visibleLightIndex) 
+    public Vector3 ReserveDirectionalShadows(Light light, int visibleLightIndex) 
     {
         if (ShadowedDirectionalLightCount < maxShadowedDirectionalLightCount &&
             light.shadows != LightShadows.None && 
             light.shadowStrength > 0.0f &&
             cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b)) 
         {
-            ShadowedDirectionalLights[ShadowedDirectionalLightCount] = new ShadowedDirectionalLight {visibleLightIndex = visibleLightIndex};
-            return new Vector2(light.shadowStrength, settings.directional.cascadeCount*ShadowedDirectionalLightCount++);
+            ShadowedDirectionalLights[ShadowedDirectionalLightCount] = 
+                new ShadowedDirectionalLight {
+                    visibleLightIndex = visibleLightIndex,
+                    slopeScaleBias = light.shadowBias
+                };
+            return new Vector3(
+                light.shadowStrength,
+                settings.directional.cascadeCount * ShadowedDirectionalLightCount++,
+                light.shadowNormalBias
+                );
         }
 
-        return Vector2.zero;
+        return Vector3.zero;
     }
 
     public void Setup
@@ -135,6 +147,18 @@ public class Shadows
         return m;
     }
 
+    void SetCascadeData (int index, Vector4 cullingSphere, float tileSize)
+    {
+        float texelSize = 2f * cullingSphere.w / tileSize;
+        cullingSphere.w *= cullingSphere.w;
+        cascadeCullingSpheres[index] = cullingSphere;
+        cascadeData[index] = new Vector4(
+            1f / cullingSphere.w,
+            texelSize * 1.4142136f // texel size * sqrt(2)
+        );
+    }
+
+
     void RenderDirectionalShadows()
     {
         int atlasSize = (int)settings.directional.atlasSize;
@@ -163,6 +187,7 @@ public class Shadows
 
         buffer.SetGlobalInt(cascadeCountId, settings.directional.cascadeCount);
         buffer.SetGlobalVectorArray(cascadeCullingSpheresId, cascadeCullingSpheres);
+        buffer.SetGlobalVectorArray(cascadeDataId, cascadeData);
         buffer.SetGlobalMatrixArray(dirShadowMatricesId, dirShadowMatrices);
         float f = 1f - settings.directional.cascadeFade;
         buffer.SetGlobalVector(
@@ -198,15 +223,15 @@ public class Shadows
             shadowSettings.splitData = splitData;
             if (index == 0)
             {
-                Vector4 cullingSphere = splitData.cullingSphere;
-                cullingSphere.w *= cullingSphere.w;
-                cascadeCullingSpheres[i] = cullingSphere;
+                SetCascadeData(i, splitData.cullingSphere, tileSize);
             }
             int tileIndex = tileOffset + i;
             dirShadowMatrices[tileIndex] = ConvertToAtlasMatrix(projectionMatrix * viewMatrix, SetTileViewport(tileIndex, split, tileSize), split);
             buffer.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
+            buffer.SetGlobalDepthBias(0f, light.slopeScaleBias);
             ExecuteBuffer();
             context.DrawShadows(ref shadowSettings);
+            buffer.SetGlobalDepthBias(0f, 0f);
         }
 
     }

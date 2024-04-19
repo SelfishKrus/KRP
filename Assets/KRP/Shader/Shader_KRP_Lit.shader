@@ -32,6 +32,7 @@ Shader "KRP/Lit"
             #pragma multi_compile_instancing
             #pragma shader_feature _ _CLIPPING
             #pragma shader_feature _ _PREMULTIPLY_ALPHA
+            #pragma multi_compile _ _DIRECTIONAL_PCF3 _DIRECTIONAL_PCF5 _DIRECTIONAL_PCF7
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
 

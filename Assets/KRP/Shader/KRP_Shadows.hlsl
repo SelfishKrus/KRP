@@ -1,6 +1,19 @@
 ﻿#ifndef KRP_SHADOWS_INCLUDED
 #define KRP_SHADOWS_INCLUDED
 
+	#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Shadow/ShadowSamplingTent.hlsl"
+
+	#if defined(_DIRECTIONAL_PCF3)
+		#define DIRECTIONAL_FILTER_SAMPLES 4
+		#define DIRECTIONAL_FILTER_SETUP SampleShadow_ComputeSamples_Tent_3x3
+	#elif defined(_DIRECTIONAL_PCF5)
+		#define DIRECTIONAL_FILTER_SAMPLES 9
+		#define DIRECTIONAL_FILTER_SETUP SampleShadow_ComputeSamples_Tent_5x5
+	#elif defined(_DIRECTIONAL_PCF7)
+		#define DIRECTIONAL_FILTER_SAMPLES 16
+		#define DIRECTIONAL_FILTER_SETUP SampleShadow_ComputeSamples_Tent_7x7
+	#endif
+
 	#define MAX_SHADOWED_DIRECTIONAL_LIGHT_COUNT 4
 	#define MAX_CASCADE_COUNT 4
 
@@ -13,6 +26,7 @@
 		float4 _CascadeCullingSpheres[MAX_CASCADE_COUNT];
 		float4 _CascadeData[MAX_CASCADE_COUNT];
 		float4x4 _DirectionalShadowMatrices[MAX_SHADOWED_DIRECTIONAL_LIGHT_COUNT * MAX_CASCADE_COUNT];
+		float4 _ShadowAtlasSize;
 		float4 _ShadowDistanceFade;
 	CBUFFER_END
 
@@ -65,6 +79,25 @@
 		return SAMPLE_TEXTURE2D_SHADOW(_DirectionalShadowAtlas, SHADOW_SAMPLER, posSTS);
 	}
 
+	float FilterDirectionalShadow (float3 posSTS) 
+	{
+		#if defined(DIRECTIONAL_FILTER_SETUP)
+			float weights[DIRECTIONAL_FILTER_SAMPLES];
+			float2 poss[DIRECTIONAL_FILTER_SAMPLES];
+			float4 size = _ShadowAtlasSize.yyxx;
+			DIRECTIONAL_FILTER_SETUP(size, posSTS.xy, weights, poss);
+			float shadow = 0;
+			for (int i = 0; i < DIRECTIONAL_FILTER_SAMPLES; i++) {
+				shadow += weights[i] * SampleDirectionalShadowAtlas(
+					float3(poss[i].xy, posSTS.z)
+				);
+			}
+			return shadow;
+		#else
+			return SampleDirectionalShadowAtlas(posSTS);
+		#endif
+	}
+
 	float GetDirectionalShadowAttenuation (DirectionalShadowData directionalData, ShadowData globalData, Surface surfaceWS) 
 	{
 		if (directionalData.strength <= 0.0f)	
@@ -73,7 +106,7 @@
 			surfaceWS.normal * 
 			(directionalData.normalBias *_CascadeData[globalData.cascadeIndex].y);
 		float3 posSTS = mul(_DirectionalShadowMatrices[directionalData.tileIndex],float4(surfaceWS.position+normalBias, 1.0)).xyz;
-		float shadow = SampleDirectionalShadowAtlas(posSTS);
+		float shadow = FilterDirectionalShadow(posSTS);
 
 		return lerp(1.0f, shadow, directionalData.strength);
 	}

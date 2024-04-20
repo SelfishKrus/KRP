@@ -56,8 +56,11 @@
         half3 baseCol = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseCol).rgb;
         half3 col = baseCol * baseMap.rgb;
 
-        #ifdef _CLIPPING
+        #ifdef _SHADOWS_CLIP
             clip(baseMap.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
+        #elif defined(_SHADOWS_DITHER)
+            float dither = InterleavedGradientNoise(i.posCS.xy, 0);
+            clip(base.a - dither);
         #endif
     }
 

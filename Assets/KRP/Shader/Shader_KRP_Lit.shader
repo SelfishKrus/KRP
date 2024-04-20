@@ -45,7 +45,9 @@ Shader "KRP/Lit"
         }
 
         Pass
-        {
+        {   
+            Name "ShadowCaster"
+
             Tags {"LightMode"="ShadowCaster"}
             ColorMask 0
 

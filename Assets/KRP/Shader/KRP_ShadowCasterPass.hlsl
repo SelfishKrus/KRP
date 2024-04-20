@@ -60,7 +60,7 @@
             clip(baseMap.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
         #elif defined(_SHADOWS_DITHER)
             float dither = InterleavedGradientNoise(i.posCS.xy, 0);
-            clip(base.a - dither);
+            clip(baseMap.a - dither);
         #endif
     }
 

@@ -120,6 +120,10 @@
 
 	float GetDirectionalShadowAttenuation (DirectionalShadowData directionalData, ShadowData globalData, Surface surfaceWS) 
 	{
+		#ifndef _RECEIVE_SHADOWS
+			return 1.0f;
+		#endif 
+
 		if (directionalData.strength <= 0.0f)	
 			return 1.0f;
 		float3 normalBias = 

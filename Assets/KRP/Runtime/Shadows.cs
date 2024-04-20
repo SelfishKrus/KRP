@@ -255,6 +255,8 @@ public class Shadows
         int tileOffset = index * cascadeCount;
         Vector3 ratios = settings.directional.CascadeRatios;
 
+        // Prevent transition from culling 
+        float cullingFactor = Mathf.Max(0f, 0.8f - settings.directional.cascadeFade);
         for (int i = 0; i < cascadeCount; i++)
         {
 
@@ -264,6 +266,7 @@ public class Shadows
                 out Matrix4x4 projectionMatrix, out ShadowSplitData splitData
             );
 
+            splitData.shadowCascadeBlendCullingFactor = cullingFactor;
             shadowSettings.splitData = splitData;
             if (index == 0)
             {
@@ -277,7 +280,6 @@ public class Shadows
             context.DrawShadows(ref shadowSettings);
             buffer.SetGlobalDepthBias(0f, 0f);
         }
-
     }
 
     public void Render()

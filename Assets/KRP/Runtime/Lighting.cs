@@ -68,7 +68,6 @@ namespace KRP
             shadows.Cleanup();
         }
 
-
         // MAIN // 
         public void Setup(ScriptableRenderContext context, CullingResults cullingResults, ShadowSettings shadowSettings)
         {

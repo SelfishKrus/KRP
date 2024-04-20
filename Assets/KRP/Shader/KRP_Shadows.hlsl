@@ -68,7 +68,20 @@
 			};
 		}
 
-		if (i == _CascadeCount) data.strength = 0.0f;
+		if (i == _CascadeCount) 
+		{
+			data.strength = 0.0f;
+		}
+		#ifdef _CASCADE_BLEND_DITHER
+			else if (data.cascadeBlend < surfaceWS.dither) 
+			{
+				i += 1;
+			}
+		#endif
+
+		#ifndef _CASCADE_BLEND_SOFT
+			data.cascadeBlend = 1.0f;
+		#endif 
 
 		data.cascadeIndex = i;
 		return data;

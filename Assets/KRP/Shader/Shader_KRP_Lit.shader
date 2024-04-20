@@ -33,6 +33,8 @@ Shader "KRP/Lit"
             #pragma shader_feature _ _CLIPPING
             #pragma shader_feature _ _PREMULTIPLY_ALPHA
             #pragma multi_compile _ _DIRECTIONAL_PCF3 _DIRECTIONAL_PCF5 _DIRECTIONAL_PCF7
+            #pragma multi_compile _ _CASCADE_BLEND_SOFT _CASCADE_BLEND_DITHER
+
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
 
@@ -50,9 +52,12 @@ Shader "KRP/Lit"
 			#pragma target 3.5
 			#pragma shader_feature _CLIPPING
 			#pragma multi_compile_instancing
+
 			#pragma vertex ShadowCasterPassVertex
 			#pragma fragment ShadowCasterPassFragment
+
             #include "KRP_ShadowCasterPass.hlsl"
+
 			ENDHLSL
         }
     }

@@ -1,6 +1,8 @@
 ﻿#ifndef KRP_LIT_PASS_INCLUDED
 #define KRP_LIT_PASS_INCLUDED
 
+    //#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Random.hlsl"
+
     #include "KRP_Common.hlsl"
     #include "KRP_Surface.hlsl"
     #include "KRP_Shadows.hlsl"
@@ -68,6 +70,7 @@
         surface.alpha = baseMap.a;
         surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
         surface.smoothness = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Smoothness);
+        surface.dither = InterleavedGradientNoise(i.posCS.xy, 0);
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);
         surface.depth = -TransformWorldToView(i.posWS).z;
 

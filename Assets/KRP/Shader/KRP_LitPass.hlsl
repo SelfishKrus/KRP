@@ -25,6 +25,8 @@
         float4 posOS : POSITION;
         float2 uv : TEXCOORD0;
         float3 normalOS : NORMAL;
+
+        GI_ATTRIBUTE_DATA
         // Object index
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
@@ -35,6 +37,8 @@
         float3 posWS : VAR_POSITION;
         float2 uv : VAR_UV;
         float3 normalWS : VAR_NORMAL;
+
+        GI_VARYINGS_DATA
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -43,6 +47,8 @@
         Varyings o;
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_TRANSFER_INSTANCE_ID(i, o);
+        TRANSFER_GI_DATA(i, o);
+
         float4 baseMapST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
         o.uv = i.uv * baseMapST.xy + baseMapST.zw;
         o.posWS = TransformObjectToWorld(i.posOS.xyz);
@@ -74,7 +80,8 @@
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);
         surface.depth = -TransformWorldToView(i.posWS).z;
 
-        col = GetLighting(surface);
+        GI gi = GetGI(GI_FRAGMENT_DATA(i));
+        col = GetLighting(surface, gi);
 
         return half4(col, surface.alpha);
     }

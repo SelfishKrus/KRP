@@ -4,6 +4,7 @@
     #include "KRP_Surface.hlsl"
     #include "KRP_Light.hlsl"
     #include "KRP_BRDF.hlsl"
+    #include "KRP_GI.hlsl"
 
     float3 IncomingLighting (Surface surface, Light light)
     {
@@ -16,10 +17,10 @@
         return IncomingLighting(surface, light) * (brdf.diffuse + brdf.specular);
     }
 
-    float3 GetLighting (Surface surfaceWS)
+    float3 GetLighting (Surface surfaceWS, GI gi)
     {   
         ShadowData shadowData = GetShadowData(surfaceWS);
-        float3 color = 0.0;
+        float3 color = gi.diffuse;
         for (int i = 0; i < GetDirectionalLightCount(); i++)
         {   
             Light light = GetDirectionalLight(i, surfaceWS, shadowData);

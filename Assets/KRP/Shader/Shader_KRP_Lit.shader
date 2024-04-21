@@ -31,10 +31,13 @@ Shader "KRP/Lit"
 
             HLSLPROGRAM
             #pragma target 3.5
+            #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_instancing
+
             #pragma shader_feature _ _CLIPPING
             #pragma shader_feature _ _PREMULTIPLY_ALPHA
             #pragma shader_feature _RECEIVE_SHADOWS
+
             #pragma multi_compile _ _DIRECTIONAL_PCF3 _DIRECTIONAL_PCF5 _DIRECTIONAL_PCF7
             #pragma multi_compile _ _CASCADE_BLEND_SOFT _CASCADE_BLEND_DITHER
 

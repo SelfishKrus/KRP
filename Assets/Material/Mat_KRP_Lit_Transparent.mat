@@ -7,16 +7,23 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Mat_Unlit
-  m_Shader: {fileID: 4800000, guid: 64ea272a09b5b0e45a22892d96474604, type: 3}
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_Name: Mat_KRP_Lit_Transparent
+  m_Shader: {fileID: 4800000, guid: 502d846a92fdd094897f28649f0b6808, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _PREMULTIPLY_ALPHA
+  - _RECEIVE_SHADOWS
+  - _SHADOWS_DITHER
+  m_InvalidKeywords:
+  - _SHADOWS_ON
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
+  m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -27,11 +34,15 @@ Material:
     m_Ints: []
     m_Floats:
     - _Clipping: 0
-    - _Cutoff: 0.63
+    - _Cutoff: 0.297
     - _DstBlend: 10
-    - _SrcBlend: 5
+    - _Metallic: 0
+    - _PremultiplyAlpha: 1
+    - _ReceiveShadows: 1
+    - _Shadows: 2
+    - _Smoothness: 0.5
+    - _SrcBlend: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseCol: {r: 0.5451743, g: 0.38547018, b: 0.8773585, a: 1}
-    - _Color: {r: 0.7830189, g: 0.36688617, b: 0.36688617, a: 1}
+    - _BaseCol: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

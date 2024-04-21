@@ -18,7 +18,7 @@ namespace KRP
 
         Shader KrpDefaultShader => Shader.Find("KRP/Lit"); 
         public override Shader defaultShader => KrpDefaultShader;
-        public override Material defaultMaterial => new Material(KrpDefaultShader);
+        public override Material defaultMaterial => KrpDefaultShader != null ? new Material(KrpDefaultShader) : null;
 
         protected override RenderPipeline CreatePipeline()
         {

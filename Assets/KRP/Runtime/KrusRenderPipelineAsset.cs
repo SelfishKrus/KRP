@@ -16,6 +16,10 @@ namespace KRP
         [SerializeField]
         ShadowSettings shadows = default;
 
+        Shader KrpDefaultShader => Shader.Find("KRP/Lit"); 
+        public override Shader defaultShader => KrpDefaultShader;
+        public override Material defaultMaterial => new Material(KrpDefaultShader);
+
         protected override RenderPipeline CreatePipeline()
         {
             return new KrusRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher, shadows);

@@ -2,14 +2,7 @@
 #define KRP_SHADOW_CASTER_PASS_INCLUDED
 
     #include "KRP_Common.hlsl"
-
-    TEXTURE2D(_BaseMap);    SAMPLER(sampler_BaseMap);
-
-    UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
-        UNITY_DEFINE_INSTANCED_PROP(float4, _BaseMap_ST)
-        UNITY_DEFINE_INSTANCED_PROP(float4, _BaseCol)
-        UNITY_DEFINE_INSTANCED_PROP(float, _Cutoff)
-    UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
+    #include "KRP_LitInput.hlsl"
 
     struct Attributes
     {
@@ -43,8 +36,7 @@
 			    max(o.posCS.z, o.posCS.w * UNITY_NEAR_CLIP_VALUE);
 	    #endif
 
-        float4 baseMapST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
-        o.uv = i.uv * baseMapST.xy + baseMapST.zw;
+        o.uv = TransformBaseUV(i.uv);
         return o;
     }
 
@@ -52,15 +44,13 @@
     {   
         UNITY_SETUP_INSTANCE_ID(i);
 
-        half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, i.uv);
-        half3 baseCol = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseCol).rgb;
-        half3 col = baseCol * baseMap.rgb;
+        half4 baseCol = GetBaseColor(i.uv);
 
         #ifdef _SHADOWS_CLIP
-            clip(baseMap.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
+            clip(baseCol.a - GetCutoff(i.uv));
         #elif defined(_SHADOWS_DITHER)
             float dither = InterleavedGradientNoise(i.posCS.xy, 0);
-            clip(baseMap.a - dither);
+            clip(baseCol.a - dither);
         #endif
     }
 

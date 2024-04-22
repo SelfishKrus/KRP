@@ -11,20 +11,21 @@
         return max(0.00001, dot(surface.normal, light.direction) * light.attenuation) * light.color;
     }
 
-    float3 GetLighting (Surface surface, Light light)
+    float3 GetLighting (Surface surface, Light light, BRDF brdf)
     {   
-        BRDF brdf = GetBRDF_DL(surface, light);
         return IncomingLighting(surface, light) * (brdf.diffuse + brdf.specular);
     }
 
     float3 GetLighting (Surface surfaceWS, GI gi)
     {   
         ShadowData shadowData = GetShadowData(surfaceWS);
-        float3 color = gi.diffuse;
+        float3 color = 0.0f;
         for (int i = 0; i < GetDirectionalLightCount(); i++)
         {   
             Light light = GetDirectionalLight(i, surfaceWS, shadowData);
-            color += GetLighting(surfaceWS, light);
+            BRDF brdf = GetBRDF_DL(surfaceWS, light);
+            color += (i==0) ? gi.diffuse * brdf.diffuse : 0.0f;
+            color += GetLighting(surfaceWS, light, brdf);
         }
         return color;
     }

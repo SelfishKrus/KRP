@@ -3,7 +3,7 @@ Shader "KRP/Lit"
     Properties
     {   
         _BaseMap ("Texture", 2D) = "white" {}
-        _BaseCol ("Color", Color) = (1,1,1,1)
+        _BaseColor ("Color", Color) = (1,1,1,1)
         _Cutoff ("Alpha Cutoff", Range(0.0, 1.0)) = 0.0
 		[Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 1
 		[Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 0
@@ -23,7 +23,9 @@ Shader "KRP/Lit"
         LOD 100
 
         Pass
-        {
+        {   
+            Name "LitPass"
+
             Tags {"LightMode"="KRPLit"}
 
             Blend [_SrcBlend] [_DstBlend]
@@ -51,7 +53,7 @@ Shader "KRP/Lit"
 
         Pass
         {   
-            Name "ShadowCaster"
+            Name "ShadowCasterPass"
 
             Tags {"LightMode"="ShadowCaster"}
             ColorMask 0
@@ -68,6 +70,24 @@ Shader "KRP/Lit"
 
 			ENDHLSL
         }
+
+        Pass 
+        {   
+			Tags {"LightMode" = "Meta"}
+
+			Cull Off
+
+			HLSLPROGRAM
+			#pragma target 3.5
+			#pragma vertex MetaPassVertex
+			#pragma fragment MetaPassFragment
+
+			#include "KRP_MetaPass.hlsl"
+
+			ENDHLSL
+		}
     }
+
     CustomEditor "KRPShaderGUI"
+
 }

@@ -1,6 +1,0 @@
-﻿#ifndef KRP_LIT_PASS_INCLUDED
-#define KRP_LIT_PASS_INCLUDED
-
-
-
-#endif 

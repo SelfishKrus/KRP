@@ -75,6 +75,8 @@ public class KRPShaderGUI : ShaderGUI
         materials = materialEditor.targets;
         this.properties = properties;
 
+        BakedEmission();
+
         EditorGUILayout.Space();
 
         showPresets = EditorGUILayout.Foldout(showPresets, "Presets", true);
@@ -207,6 +209,21 @@ public class KRPShaderGUI : ShaderGUI
         foreach (Material m in materials)
         {
             m.SetShaderPassEnabled("ShadowCaster", enabled);
+        }
+    }
+
+    void BakedEmission()
+    {
+        EditorGUI.BeginChangeCheck();
+        editor.LightmapEmissionProperty();
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (Material m in editor.targets)
+            {
+                // clear the EmissiveIsBlack flag from the globalIlluminationFlags
+                m.globalIlluminationFlags &=
+                    ~MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+            }
         }
     }
 }

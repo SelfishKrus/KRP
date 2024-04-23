@@ -15,12 +15,19 @@ Shader "KRP/Lit"
         [Header(PBR ARGS)]
         _Metallic ("Metallic", Range(0.0, 1.0)) = 0.0
         _Smoothness ("Smoothness", Range(0.0, 1.0)) = 0.5
+		[HDR] _EmissionColor("Emission", Color) = (0.0, 0.0, 0.0, 0.0)
+        [NoScaleOffset] _EmissionMap("Emission", 2D) = "white" {}
         [Toggle(_PREMULTIPLY_ALPHA)] _PremultiplyAlpha ("Premultiply Alpha", Float) = 0
     }
     SubShader
     {
         Tags {}
         LOD 100
+
+        HLSLINCLUDE
+        #include "KRP_Common.hlsl"
+        #include "KRP_LitInput.hlsl"
+        ENDHLSL
 
         Pass
         {   

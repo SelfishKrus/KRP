@@ -1,9 +1,6 @@
 ﻿#ifndef KRP_META_PASS_INCLUDED
 #define KRP_META_PASS_INCLUDED
 
-	#include "KRP_Common.hlsl"
-    #include "KRP_LitInput.hlsl"
-
 	#include "KRP_Surface.hlsl"
 	#include "KRP_Shadows.hlsl"
 	#include "KRP_Light.hlsl"
@@ -60,6 +57,11 @@
 			meta.rgb += brdf.specular * brdf.roughness * 0.5;
 			meta.rgb = min(PositivePow(meta.rgb, unity_OneOverOutputBoost), unity_MaxOutputValue);
 		}
+		else if (unity_MetaFragmentControl.y) 
+		{
+			meta = float4(GetEmission(i.uv_base), 1.0);
+		}
+
 		return meta;
 	}
 

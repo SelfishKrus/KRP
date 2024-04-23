@@ -1,9 +1,6 @@
 ﻿#ifndef KRP_SHADOW_CASTER_PASS_INCLUDED
 #define KRP_SHADOW_CASTER_PASS_INCLUDED
 
-    #include "KRP_Common.hlsl"
-    #include "KRP_LitInput.hlsl"
-
     struct Attributes
     {
         float4 posOS : POSITION;

@@ -3,7 +3,7 @@ Shader "KRP/Unlit"
     Properties
     {   
         _BaseMap ("Texture", 2D) = "white" {}
-        _BaseColor ("Color", Color) = (1,1,1,1)
+        [HDR] _BaseColor ("Color", Color) = (1,1,1,1)
         _Cutoff ("Alpha Cutoff", Range(0.0, 1.0)) = 0.0
 		[Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 1
 		[Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 0
@@ -14,6 +14,11 @@ Shader "KRP/Unlit"
     {
         Tags {}
         LOD 100
+
+        HLSLINCLUDE
+        #include "KRP_Common.hlsl"
+        #include "KRP_UnlitInput.hlsl"
+        ENDHLSL
 
         Pass
         {   
@@ -30,9 +35,6 @@ Shader "KRP/Unlit"
             #pragma shader_feature _ _CLIPPING
             #pragma vertex vert
             #pragma fragment frag
-
-            #include "KRP_Common.hlsl"
-            #include "KRP_UnlitInput.hlsl"
 
             struct Attributes
             {
@@ -90,9 +92,13 @@ Shader "KRP/Unlit"
 			#pragma vertex MetaPassVertex
 			#pragma fragment MetaPassFragment
 
+            #pragma multi_compile _ LIT_SHADER UNLIT_SHADER
+
 			#include "KRP_MetaPass.hlsl"
 
 			ENDHLSL
 		}
     }
+
+    CustomEditor "KRPShaderGUI"
 }

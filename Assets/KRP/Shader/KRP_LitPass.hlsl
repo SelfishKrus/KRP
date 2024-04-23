@@ -3,9 +3,6 @@
 
     //#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Random.hlsl"
 
-    #include "KRP_Common.hlsl"
-    #include "KRP_LitInput.hlsl"
-
     #include "KRP_Surface.hlsl"
     #include "KRP_Shadows.hlsl"
     #include "KRP_Light.hlsl"
@@ -71,6 +68,7 @@
 
         GI gi = GetGI(GI_FRAGMENT_DATA(i), surface);
         half3 col = GetLighting(surface, gi);
+        col += GetEmission(i.uv_base);
 
         return half4(col, surface.alpha);
     }

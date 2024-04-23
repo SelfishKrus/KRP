@@ -37,4 +37,9 @@
 	    return 0;
     }
 
+    float3 GetEmission (float2 baseUV) 
+    {
+	    return GetBaseColor(baseUV).rgb;
+    }
+
 #endif 

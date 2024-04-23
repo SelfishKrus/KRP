@@ -52,7 +52,7 @@
         half4 baseCol = GetBaseColor(i.uv_base);
 
         #ifdef _CLIPPING
-            clip(baseMap.a - GetCutoff(i.uv_base));
+            clip(baseCol.a - GetCutoff(i.uv_base));
         #endif
 
         Surface surface;

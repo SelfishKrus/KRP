@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MeshBalls : MonoBehaviour
 {
 	static int 
-		baseColorId = Shader.PropertyToID("_BaseCol"),
+		baseColorId = Shader.PropertyToID("_BaseColor"),
 		metallicId = Shader.PropertyToID("_Metallic"),
 		smoothnessId = Shader.PropertyToID("_Smoothness");
 
@@ -28,7 +29,7 @@ public class MeshBalls : MonoBehaviour
 		for (int i = 0; i < matrices.Length; i++) 
         {
 			matrices[i] = Matrix4x4.TRS(
-				Random.insideUnitSphere * 10f, Quaternion.identity, Vector3.one
+				transform.position + Random.insideUnitSphere * 10f, Quaternion.identity, Vector3.one
 			);
 			baseColors[i] = new Vector4(Random.value, Random.value, Random.value, 1f);
 			metallic[i] = Random.value < 0.25f ? 1f : 0f;
@@ -45,8 +46,22 @@ public class MeshBalls : MonoBehaviour
 			block.SetFloatArray(metallicId, metallic);
 			block.SetFloatArray(smoothnessId, smoothness);
         }
+
+		// Calculate light probes for instances
+        var positions = new Vector3[1023];
+        for (int i = 0; i < matrices.Length; i++)
+        {
+            positions[i] = matrices[i].GetColumn(3);
+        }
+        var lightProbes = new SphericalHarmonicsL2[1023];
+        LightProbes.CalculateInterpolatedLightAndOcclusionProbes(
+            positions, lightProbes, null
+        );
+        block.CopySHCoefficientArraysFrom(lightProbes);
+
         Graphics.DrawMeshInstanced(
-            mesh, 0, material, matrices, 1023, block
+            mesh, 0, material, matrices, 1023, block,
+            ShadowCastingMode.On, true, 0, null, LightProbeUsage.CustomProvided
         );
     }
 }

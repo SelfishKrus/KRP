@@ -15,7 +15,10 @@ public class MeshBalls : MonoBehaviour
 	[SerializeField]
 	Material material = default;
 
-	Matrix4x4[] matrices = new Matrix4x4[1023];
+    [SerializeField]
+    LightProbeProxyVolume lightProbeVolume = null;
+
+    Matrix4x4[] matrices = new Matrix4x4[1023];
 	Vector4[] baseColors = new Vector4[1023];
 
 	float[]
@@ -24,7 +27,7 @@ public class MeshBalls : MonoBehaviour
 
 	MaterialPropertyBlock block;
 
-	void Awake () 
+    void Awake () 
     {
 		for (int i = 0; i < matrices.Length; i++) 
         {
@@ -47,21 +50,26 @@ public class MeshBalls : MonoBehaviour
 			block.SetFloatArray(smoothnessId, smoothness);
         }
 
-		// Calculate light probes for instances
-        var positions = new Vector3[1023];
-        for (int i = 0; i < matrices.Length; i++)
+        if (!lightProbeVolume) 
         {
-            positions[i] = matrices[i].GetColumn(3);
+            // Calculate light probes for instances
+            var positions = new Vector3[1023];
+            for (int i = 0; i < matrices.Length; i++)
+            {
+                positions[i] = matrices[i].GetColumn(3);
+            }
+            var lightProbes = new SphericalHarmonicsL2[1023];
+            LightProbes.CalculateInterpolatedLightAndOcclusionProbes(
+                positions, lightProbes, null
+            );
+            block.CopySHCoefficientArraysFrom(lightProbes);
         }
-        var lightProbes = new SphericalHarmonicsL2[1023];
-        LightProbes.CalculateInterpolatedLightAndOcclusionProbes(
-            positions, lightProbes, null
-        );
-        block.CopySHCoefficientArraysFrom(lightProbes);
 
         Graphics.DrawMeshInstanced(
             mesh, 0, material, matrices, 1023, block,
-            ShadowCastingMode.On, true, 0, null, LightProbeUsage.CustomProvided
+            ShadowCastingMode.On, true, 0, null,
+            lightProbeVolume ? LightProbeUsage.UseProxyVolume : LightProbeUsage.CustomProvided,
+            lightProbeVolume
         );
     }
 }

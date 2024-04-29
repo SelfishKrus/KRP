@@ -28,8 +28,8 @@ Shader "KRP/Lit"
         LOD 100
 
         HLSLINCLUDE
-        #include "KRP_Common.hlsl"
-        #include "KRP_LitInput.hlsl"
+        #include "../ShaderLibrary/KRP_Common.hlsl"
+        #include "../ShaderLibrary/KRP_LitInput.hlsl"
         ENDHLSL
 
         Pass

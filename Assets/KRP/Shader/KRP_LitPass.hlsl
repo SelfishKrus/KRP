@@ -3,11 +3,11 @@
 
     //#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Random.hlsl"
 
-    #include "KRP_Surface.hlsl"
-    #include "KRP_Shadows.hlsl"
-    #include "KRP_Light.hlsl"
-    #include "KRP_BRDF.hlsl"
-    #include "KRP_Lighting.hlsl"
+    #include "../ShaderLibrary/KRP_Surface.hlsl"
+    #include "../ShaderLibrary/KRP_Shadows.hlsl"
+    #include "../ShaderLibrary/KRP_Light.hlsl"
+    #include "../ShaderLibrary/KRP_BRDF.hlsl"
+    #include "../ShaderLibrary/KRP_Lighting.hlsl"
 
     struct Attributes
     {

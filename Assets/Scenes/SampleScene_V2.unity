@@ -492,6 +492,7 @@ GameObject:
   m_Component:
   - component: {fileID: 326011873}
   - component: {fileID: 326011872}
+  - component: {fileID: 326011874}
   m_Layer: 0
   m_Name: MeshBalls
   m_TagString: Untagged
@@ -513,6 +514,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: c59cfa95a2432ad4186848f35e40000f, type: 2}
+  lightProbeVolume: {fileID: 326011874}
 --- !u!4 &326011873
 Transform:
   m_ObjectHideFlags: 0
@@ -528,6 +530,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 775507405}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!259 &326011874
+LightProbeProxyVolume:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326011871}
+  m_Enabled: 1
+  m_BoundingBoxMode: 0
+  m_ResolutionX: 2
+  m_ResolutionY: 2
+  m_ResolutionZ: 2
+  m_ResolutionProbesPerUnit: 0.25
+  m_BoundingBoxSize: {x: Infinity, y: Infinity, z: Infinity}
+  m_BoundingBoxOrigin: {x: 0, y: 0, z: 0}
+  m_ResolutionMode: 0
+  m_ProbePositionMode: 0
+  m_RefreshMode: 0
+  m_QualityMode: 1
+  m_DataFormat: 1
 --- !u!1 &354407519
 GameObject:
   m_ObjectHideFlags: 0

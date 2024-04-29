@@ -19,8 +19,8 @@ Shader "KRP/Unlit"
         LOD 100
 
         HLSLINCLUDE
-        #include "KRP_Common.hlsl"
-        #include "KRP_UnlitInput.hlsl"
+        #include "../ShaderLibrary/KRP_Common.hlsl"
+        #include "../ShaderLibrary/KRP_UnlitInput.hlsl"
         ENDHLSL
 
         Pass

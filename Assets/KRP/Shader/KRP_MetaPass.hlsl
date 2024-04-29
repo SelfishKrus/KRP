@@ -1,10 +1,10 @@
 ﻿#ifndef KRP_META_PASS_INCLUDED
 #define KRP_META_PASS_INCLUDED
 
-	#include "KRP_Surface.hlsl"
-	#include "KRP_Shadows.hlsl"
-	#include "KRP_Light.hlsl"
-	#include "KRP_BRDF.hlsl"
+	#include "../ShaderLibrary/KRP_Surface.hlsl"
+	#include "../ShaderLibrary/KRP_Shadows.hlsl"
+	#include "../ShaderLibrary/KRP_Light.hlsl"
+	#include "../ShaderLibrary/KRP_BRDF.hlsl"
 
 	// x = return albedo
     // y = return normal

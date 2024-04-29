@@ -7,6 +7,8 @@
 		float4 unity_LODFade;
 		float4 unity_WorldTransformParams;
 
+		float4 unity_ProbesOcclusion; // occlusion data for light probes
+
 		// Lightmap
 		float4 unity_LightmapST;
 		float4 unity_DynamicLightmapST;

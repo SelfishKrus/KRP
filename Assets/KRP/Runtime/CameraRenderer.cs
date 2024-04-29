@@ -85,8 +85,11 @@ namespace KRP
                 enableInstancing = useGPUInstancing,
                 perObjectData = 
                     PerObjectData.Lightmaps |
-                    PerObjectData.LightProbe | 
-                    PerObjectData.LightProbeProxyVolume
+                    PerObjectData.ShadowMask | 
+                    PerObjectData.LightProbe |
+                    PerObjectData.OcclusionProbe |
+                    PerObjectData.LightProbeProxyVolume |
+                    PerObjectData.OcclusionProbeProxyVolume
             };
             drawingSettings.SetShaderPassName(1, litShaderTagId);
             var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);

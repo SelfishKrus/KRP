@@ -19,6 +19,7 @@
     float3 GetLighting (Surface surfaceWS, GI gi)
     {   
         ShadowData shadowData = GetShadowData(surfaceWS);
+        shadowData.shadowMask = gi.shadowMask;
         float3 color = 0.0f;
         for (int i = 0; i < GetDirectionalLightCount(); i++)
         {   

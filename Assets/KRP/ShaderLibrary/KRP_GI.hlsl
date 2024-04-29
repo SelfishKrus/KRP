@@ -2,9 +2,13 @@
 #define KRP_GI_INCLUDED
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/EntityLighting.hlsl"
+	#include "KRP_Shadows.hlsl"
 
     TEXTURE2D(unity_Lightmap);  
     SAMPLER(sampler_unity_Lightmap);
+
+	TEXTURE2D(unity_ShadowMask);
+	SAMPLER(sampler_unity_ShadowMask);
 
 	TEXTURE3D_FLOAT(unity_ProbeVolumeSH);
 	SAMPLER(sampler_unity_ProbeVolumeSH);
@@ -20,6 +24,29 @@
         #define TRANSFER_GI_DATA(i, o)
         #define GI_FRAGMENT_DATA(i) 0.0
     #endif 
+
+	float4 SampleBakedShadows (float2 uv_lightmap, Surface surfaceWS) 
+	{
+		#ifdef LIGHTMAP_ON
+			return SAMPLE_TEXTURE2D(
+				unity_ShadowMask, sampler_unity_ShadowMask, uv_lightmap
+			);
+		#else
+			if (unity_ProbeVolumeParams.x) 
+			{
+				return SampleProbeOcclusion(
+					TEXTURE3D_ARGS(unity_ProbeVolumeSH, sampler_unity_ProbeVolumeSH),
+					surfaceWS.position, unity_ProbeVolumeWorldToObject,
+					unity_ProbeVolumeParams.y, unity_ProbeVolumeParams.z,
+					unity_ProbeVolumeMin.xyz, unity_ProbeVolumeSizeInv.xyz
+				);
+			}
+			else 
+			{
+				return unity_ProbesOcclusion;
+			}
+		#endif
+	}
 
     float3 SampleLightMap (float2 uv_lightmap) 
     {
@@ -74,12 +101,21 @@
     struct GI
     {
         float3 diffuse;
+		ShadowMask shadowMask;
     };
 
     GI GetGI (float2 uv_lightmap, Surface surfaceWS) 
     {
 	    GI gi;
 	    gi.diffuse = SampleLightMap(uv_lightmap) + SampleLightProbe(surfaceWS);
+		gi.shadowMask.distance = false;
+		gi.shadowMask.shadows = 1.0;
+
+		#ifdef _SHADOW_MASK_DISTANCE
+			gi.shadowMask.distance = true;
+			gi.shadowMask.shadows = SampleBakedShadows(uv_lightmap, surfaceWS);
+		#endif
+
 	    return gi;
     }
 

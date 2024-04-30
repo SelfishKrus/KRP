@@ -31,7 +31,8 @@
 	CBUFFER_END
 
 	struct ShadowMask 
-	{
+	{	
+		bool always;
 		bool distance;
 		float4 shadows;
 	};
@@ -52,6 +53,7 @@
 	ShadowData GetShadowData (Surface surfaceWS) 
 	{
 		ShadowData data;
+		data.shadowMask.always = false;
 		data.shadowMask.distance = false;
 		data.shadowMask.shadows = 1.0;
 		data.cascadeBlend = 1.0f;
@@ -149,7 +151,7 @@
 	float GetBakedShadow (ShadowMask mask) 
 	{
 		float shadow = 1.0;
-		if (mask.distance) 
+		if (mask.always || mask.distance) 
 		{
 			shadow = mask.shadows.r;
 		}
@@ -158,7 +160,7 @@
 
 	float GetBakedShadow (ShadowMask mask, float strength) 
 	{
-		if (mask.distance) 
+		if (mask.always || mask.distance) 
 		{
 			return lerp(1.0f, GetBakedShadow(mask), strength);
 		}
@@ -168,6 +170,12 @@
 	float MixBakedAndRealtimeShadows (ShadowData globalData, float shadow, float strength) 
 	{
 		float baked = GetBakedShadow(globalData.shadowMask);
+		if (globalData.shadowMask.always) 
+		{
+			shadow = lerp(1.0, shadow, globalData.strength);
+			shadow = min(baked, shadow);
+			return lerp(1.0, shadow, strength);
+		}
 		if (globalData.shadowMask.distance) 
 		{	
 			shadow = lerp(baked, shadow, globalData.strength);

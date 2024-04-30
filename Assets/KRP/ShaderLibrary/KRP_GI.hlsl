@@ -108,10 +108,14 @@
     {
 	    GI gi;
 	    gi.diffuse = SampleLightMap(uv_lightmap) + SampleLightProbe(surfaceWS);
+		gi.shadowMask.always = false;
 		gi.shadowMask.distance = false;
 		gi.shadowMask.shadows = 1.0;
 
-		#ifdef _SHADOW_MASK_DISTANCE
+		#if defined(_SHADOW_MASK_ALWAYS)
+			gi.shadowMask.always = true;
+			gi.shadowMask.shadows = SampleBakedShadows(uv_lightmap, surfaceWS);
+		#elif defined(_SHADOW_MASK_DISTANCE)
 			gi.shadowMask.distance = true;
 			gi.shadowMask.shadows = SampleBakedShadows(uv_lightmap, surfaceWS);
 		#endif

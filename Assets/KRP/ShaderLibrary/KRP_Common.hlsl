@@ -13,7 +13,7 @@
     #define UNITY_PREV_MATRIX_I_M unity_prev_MatrixIM
     #define UNITY_MATRIX_P glstate_matrix_projection
 
-    #ifdef _SHADOW_MASK_DISTANCE 
+    #if defined(_SHADOW_MASK_ALWAYS) || defined(_SHADOW_MASK_DISTANCE)
         #define SHADOWS_SHADOWMASK
     #endif 
 

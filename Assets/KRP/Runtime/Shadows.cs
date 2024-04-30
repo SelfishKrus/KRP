@@ -58,6 +58,7 @@ public class Shadows
     bool useShadowMask;
     static string[] shadowMaskKeywords = 
     {
+        "_SHADOW_MASK_ALWAYS",
         "_SHADOW_MASK_DISTANCE"
     };
 
@@ -319,7 +320,9 @@ public class Shadows
 
         // enable shadow mask keywords
         buffer.BeginSample(bufferName);
-        SetKeywords(shadowMaskKeywords, useShadowMask ? 0 : -1);
+        SetKeywords(shadowMaskKeywords, useShadowMask ?
+            QualitySettings.shadowmaskMode == ShadowmaskMode.Shadowmask ? 0 : 1 
+            : -1);
         buffer.EndSample(bufferName);
         ExecuteBuffer();
     }

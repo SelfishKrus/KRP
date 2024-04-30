@@ -65,8 +65,7 @@ public class Shadows
     {
         if (ShadowedDirectionalLightCount < maxShadowedDirectionalLightCount &&
             light.shadows != LightShadows.None && 
-            light.shadowStrength > 0.0f &&
-            cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b)) 
+            light.shadowStrength > 0.0f) 
         {
             LightBakingOutput lightBaking = light.bakingOutput;
             if (
@@ -75,6 +74,11 @@ public class Shadows
             )
             {
                 useShadowMask = true;
+            }
+
+            if (!cullingResults.GetShadowCasterBounds(visibleLightIndex, out Bounds b))
+            {
+                return new Vector3(-light.shadowStrength, 0f, 0f);
             }
 
             ShadowedDirectionalLights[ShadowedDirectionalLightCount] = 

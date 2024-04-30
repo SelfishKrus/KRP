@@ -156,6 +156,15 @@
 		return shadow;
 	}
 
+	float GetBakedShadow (ShadowMask mask, float strength) 
+	{
+		if (mask.distance) 
+		{
+			return lerp(1.0f, GetBakedShadow(mask), strength);
+		}
+		return 1.0f;
+	}
+
 	float MixBakedAndRealtimeShadows (ShadowData globalData, float shadow, float strength) 
 	{
 		float baked = GetBakedShadow(globalData.shadowMask);
@@ -174,9 +183,9 @@
 		#endif 
 
 		float shadow;
-		if (directionalData.strength <= 0.0f)
+		if (directionalData.strength * globalData.strength <= 0.0f)
 		{
-			shadow = 1.0f;
+			shadow = GetBakedShadow(globalData.shadowMask, abs(directionalData.strength));
 		}
 		else 
 		{

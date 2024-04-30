@@ -26,6 +26,7 @@
         data.strength = _DL_ShadowData[lightIndex].x;
         data.tileIndex = _DL_ShadowData[lightIndex].y + shadowData.cascadeIndex;
         data.normalBias = _DL_ShadowData[lightIndex].z;
+        data.shadowMaskChannel = _DL_ShadowData[lightIndex].w;
         return data;
     }
 

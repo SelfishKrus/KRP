@@ -103,6 +103,7 @@
         float strength;
         int tileIndex;
 		float normalBias;
+		int shadowMaskChannel;
     };
 
 	float SampleDirectionalShadowAtlas (float3 posSTS)
@@ -148,28 +149,31 @@
 		return shadow;
 	}
 
-	float GetBakedShadow (ShadowMask mask) 
+	float GetBakedShadow (ShadowMask mask, int channel) 
 	{
 		float shadow = 1.0;
 		if (mask.always || mask.distance) 
 		{
-			shadow = mask.shadows.r;
+			if (channel >= 0) 
+			{
+				shadow = mask.shadows[channel];
+			}
 		}
 		return shadow;
 	}
 
-	float GetBakedShadow (ShadowMask mask, float strength) 
+	float GetBakedShadow (ShadowMask mask, int channel, float strength) 
 	{
 		if (mask.always || mask.distance) 
 		{
-			return lerp(1.0f, GetBakedShadow(mask), strength);
+			return lerp(1.0f, GetBakedShadow(mask, channel), strength);
 		}
 		return 1.0f;
 	}
 
-	float MixBakedAndRealtimeShadows (ShadowData globalData, float shadow, float strength) 
+	float MixBakedAndRealtimeShadows (ShadowData globalData, float shadow, int shadowMaskChannel, float strength) 
 	{
-		float baked = GetBakedShadow(globalData.shadowMask);
+		float baked = GetBakedShadow(globalData.shadowMask, shadowMaskChannel);
 		if (globalData.shadowMask.always) 
 		{
 			shadow = lerp(1.0, shadow, globalData.strength);
@@ -193,12 +197,12 @@
 		float shadow;
 		if (directionalData.strength * globalData.strength <= 0.0f)
 		{
-			shadow = GetBakedShadow(globalData.shadowMask, abs(directionalData.strength));
+			shadow = GetBakedShadow(globalData.shadowMask, directionalData.shadowMaskChannel, abs(directionalData.strength));
 		}
 		else 
 		{
 			shadow = GetCascadedShadow(directionalData, globalData, surfaceWS);
-			shadow = MixBakedAndRealtimeShadows(globalData, shadow, directionalData.strength);
+			shadow = MixBakedAndRealtimeShadows(globalData, shadow, directionalData.shadowMaskChannel, directionalData.strength);
 			shadow = lerp(1.0, shadow, directionalData.strength);
 		}
 		return shadow;

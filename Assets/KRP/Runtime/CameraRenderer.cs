@@ -83,9 +83,10 @@ namespace KRP
             {
                 enableDynamicBatching = useDynamicBatching,
                 enableInstancing = useGPUInstancing,
-                perObjectData = 
+                perObjectData =
                     PerObjectData.Lightmaps |
-                    PerObjectData.ShadowMask | 
+                    PerObjectData.ReflectionProbes |
+                    PerObjectData.ShadowMask |
                     PerObjectData.LightProbe |
                     PerObjectData.OcclusionProbe |
                     PerObjectData.LightProbeProxyVolume |

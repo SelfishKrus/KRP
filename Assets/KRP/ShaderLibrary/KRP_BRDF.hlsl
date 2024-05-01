@@ -77,4 +77,11 @@
 		return brdf;
 	}
 
+	float3 IndirectBRDF (Surface surface, BRDF brdf, float3 diffuse, float3 specular) 
+	{	
+		float3 reflection = specular * brdf.specular;
+		reflection /= brdf.roughness * brdf.roughness + 1.0;
+		return diffuse * brdf.diffuse + reflection;
+	}
+
 #endif 

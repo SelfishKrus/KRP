@@ -2,6 +2,7 @@
 #define KRP_GI_INCLUDED
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/EntityLighting.hlsl"
+	#include "KRP_Surface.hlsl"
 	#include "KRP_Shadows.hlsl"
 
     TEXTURE2D(unity_Lightmap);  
@@ -12,6 +13,9 @@
 
 	TEXTURE3D_FLOAT(unity_ProbeVolumeSH);
 	SAMPLER(sampler_unity_ProbeVolumeSH);
+
+	TEXTURECUBE(unity_SpecCube0);
+	SAMPLER(sampler_unity_SpecCube0);
 
     #ifdef LIGHTMAP_ON
 	    #define GI_ATTRIBUTE_DATA float2 uv_lightmap : TEXCOORD1;
@@ -97,10 +101,18 @@
 		#endif
 	}
 
+	float3 SampleEnvironment (Surface surfaceWS) 
+	{
+		float3 uvw = reflect(-surfaceWS.viewDirection, surfaceWS.normal);
+		float4 environment = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, sampler_unity_SpecCube0, uvw, 0.0);
+		return environment.rgb;
+	}
+
 
     struct GI
     {
         float3 diffuse;
+		float3 specular;
 		ShadowMask shadowMask;
     };
 
@@ -108,6 +120,7 @@
     {
 	    GI gi;
 	    gi.diffuse = SampleLightMap(uv_lightmap) + SampleLightProbe(surfaceWS);
+		gi.specular = SampleEnvironment(surfaceWS);
 		gi.shadowMask.always = false;
 		gi.shadowMask.distance = false;
 		gi.shadowMask.shadows = 1.0;
@@ -122,5 +135,6 @@
 
 	    return gi;
     }
+
 
 #endif 

@@ -25,6 +25,7 @@
         {   
             Light light = GetDirectionalLight(i, surfaceWS, shadowData);
             BRDF brdf = GetBRDF_DL(surfaceWS, light);
+            color += (i==0) ? IndirectBRDF(surfaceWS, brdf, gi.diffuse, gi.specular) : 0.0f;
             color += (i==0) ? gi.diffuse * brdf.diffuse : 0.0f;
             color += GetLighting(surfaceWS, light, brdf);
         }

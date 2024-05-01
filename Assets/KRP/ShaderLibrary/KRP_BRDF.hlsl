@@ -6,16 +6,17 @@
 		float3 diffuse;
 		float3 specular;
 		float roughness;
+		float perceptualRoughness;
 	};
 
 	#define DIELECTRIC_F0 0.04
 
-	float PerceptualSmoothnessToPerceptualRoughness(float perceptualSmoothness)
+	float PerceptualSmoothnessToPerceptualRoughness_KRP(float perceptualSmoothness)
 	{
 		return (1.0 - perceptualSmoothness);
 	}
 
-	float PerceptualRoughnessToRoughness(float perceptualRoughness)
+	float PerceptualRoughnessToRoughness_KRP(float perceptualRoughness)
 	{
 		return perceptualRoughness * perceptualRoughness;
 	}
@@ -30,6 +31,12 @@
         denom = denom * denom * PI;
         return nom / denom;
     }
+
+	float OneMinusReflectivity (float metallic) 
+	{
+		float range = 1.0 - DIELECTRIC_F0;
+		return range - metallic * range;
+	}
 
 	// Fresnel - UE Schilick 
 	float3 Fresnel_Slk(float F0, float cosTheta)
@@ -53,27 +60,19 @@
 		return G_in * G_out;
 	}
 
-	BRDF GetBRDF_DL (Surface surface, Light light) 
+	BRDF GetBRDF (Surface surface) 
 	{
 		BRDF brdf;
-		float perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness(surface.smoothness);
-		brdf.roughness = PerceptualRoughnessToRoughness(perceptualRoughness);
-		float3 H = normalize(light.direction + surface.viewDirection);
-		float HoV = max(0.00001, dot(H, surface.viewDirection));
-		float NoH = max(0.00001, dot(surface.normal, H));
-		float NoV = max(0.00001, dot(surface.normal, surface.viewDirection));
-		float NoL = max(0.00001, dot(surface.normal, light.direction));
+		float oneMinusReflectivity = OneMinusReflectivity(surface.metallic);
 
-		float3 F0 = lerp(DIELECTRIC_F0, surface.color, surface.metallic);
-		float3 fresnel = Fresnel_SL(HoV, F0, brdf.roughness);
-		float NDF = NDF_GGX(NoH, brdf.roughness);
-		float G = Geometry_SlkGGX(NoV, NoL, brdf.roughness);
+		brdf.perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness_KRP(surface.smoothness);
+		brdf.roughness = PerceptualRoughnessToRoughness_KRP(brdf.perceptualRoughness);
 
-		brdf.diffuse = (1.0 - fresnel) * surface.color;
+		brdf.diffuse = surface.color * oneMinusReflectivity;
 		#ifdef _PREMULTIPLY_ALPHA
 			brdf.diffuse *= surface.alpha;
 		#endif
-		brdf.specular = NDF * fresnel * G / (4.0 * NoV * NoL);
+		brdf.specular = lerp(DIELECTRIC_F0, surface.color, surface.metallic);
 		return brdf;
 	}
 

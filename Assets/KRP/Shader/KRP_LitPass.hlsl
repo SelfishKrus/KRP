@@ -68,8 +68,9 @@
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);
         surface.depth = -TransformWorldToView(i.posWS).z;
 
-        GI gi = GetGI(GI_FRAGMENT_DATA(i), surface);
-        half3 col = GetLighting(surface, gi);
+        BRDF brdf = GetBRDF(surface);
+        GI gi = GetGI(GI_FRAGMENT_DATA(i), surface, brdf);
+        half3 col = GetLighting(surface, gi, brdf);
         col += GetEmission(i.uv_base);
 
         return half4(col, surface.alpha);

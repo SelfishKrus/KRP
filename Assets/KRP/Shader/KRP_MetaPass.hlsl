@@ -48,7 +48,7 @@
 
 		ShadowData shadowData = GetShadowData(surface);
 		Light light = GetDirectionalLight(0, surface, shadowData);
-		BRDF brdf = GetBRDF_DL(surface, light);
+		BRDF brdf = GetBRDF(surface);
 
 		float4 meta = 0.0;
 		if (unity_MetaFragmentControl.x) 

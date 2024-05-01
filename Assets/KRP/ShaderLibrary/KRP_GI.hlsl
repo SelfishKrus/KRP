@@ -2,6 +2,7 @@
 #define KRP_GI_INCLUDED
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/EntityLighting.hlsl"
+	#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/ImageBasedLighting.hlsl"
 	#include "KRP_Surface.hlsl"
 	#include "KRP_Shadows.hlsl"
 
@@ -101,10 +102,11 @@
 		#endif
 	}
 
-	float3 SampleEnvironment (Surface surfaceWS) 
+	float3 SampleEnvironment (Surface surfaceWS, BRDF brdf) 
 	{
 		float3 uvw = reflect(-surfaceWS.viewDirection, surfaceWS.normal);
-		float4 environment = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, sampler_unity_SpecCube0, uvw, 0.0);
+		float mip = PerceptualRoughnessToMipmapLevel(brdf.perceptualRoughness);
+		float4 environment = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, sampler_unity_SpecCube0, uvw, mip);
 		return environment.rgb;
 	}
 
@@ -116,11 +118,11 @@
 		ShadowMask shadowMask;
     };
 
-    GI GetGI (float2 uv_lightmap, Surface surfaceWS) 
+    GI GetGI (float2 uv_lightmap, Surface surfaceWS, BRDF brdf) 
     {
 	    GI gi;
 	    gi.diffuse = SampleLightMap(uv_lightmap) + SampleLightProbe(surfaceWS);
-		gi.specular = SampleEnvironment(surfaceWS);
+		gi.specular = SampleEnvironment(surfaceWS, brdf);
 		gi.shadowMask.always = false;
 		gi.shadowMask.distance = false;
 		gi.shadowMask.shadows = 1.0;

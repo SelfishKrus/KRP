@@ -9,6 +9,8 @@
 
 		float4 unity_ProbesOcclusion; // occlusion data for light probes
 
+		float4 unity_SpecCube0_HDR;
+
 		// Lightmap
 		float4 unity_LightmapST;
 		float4 unity_DynamicLightmapST;

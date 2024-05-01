@@ -44,6 +44,7 @@
 	    return GetBaseColor(baseUV).rgb;
     }
 
+    // dummy function to avoid error
     float GetFresnel (float2 baseUV) 
     {
 	    return 0.0;

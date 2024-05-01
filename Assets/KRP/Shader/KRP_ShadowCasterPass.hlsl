@@ -41,6 +41,8 @@
     {   
         UNITY_SETUP_INSTANCE_ID(i);
 
+        ClipLOD(i.posCS.xy, unity_LODFade.x);
+
         half4 baseCol = GetBaseColor(i.uv);
 
         #ifdef _SHADOWS_CLIP

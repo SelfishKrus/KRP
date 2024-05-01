@@ -30,4 +30,13 @@
 	    return dot(pA - pB, pA - pB);
     }
 
+    void ClipLOD (float2 posCS, float fade) 
+    {
+	    #if defined(LOD_FADE_CROSSFADE)
+		    float dither = InterleavedGradientNoise(posCS.xy, 0);
+            // take account of negated case
+		    clip(fade + (fade < 0.0 ? dither : -dither));
+	    #endif
+    }
+
 #endif

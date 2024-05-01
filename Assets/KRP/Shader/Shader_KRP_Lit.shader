@@ -44,6 +44,7 @@ Shader "KRP/Lit"
             HLSLPROGRAM
             #pragma target 3.5
             #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile_instancing
 
             #pragma shader_feature _ _CLIPPING
@@ -71,6 +72,7 @@ Shader "KRP/Lit"
 
             HLSLPROGRAM
 			#pragma target 3.5
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma shader_feature _ _SHADOWS_CLIP _SHADOWS_DITHER
 			#pragma multi_compile_instancing
 

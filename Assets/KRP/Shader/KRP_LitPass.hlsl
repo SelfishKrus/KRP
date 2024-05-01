@@ -64,6 +64,7 @@
         surface.alpha = baseCol.a;
         surface.metallic = GetMetallic(i.uv_base);
         surface.smoothness = GetSmoothness(i.uv_base);
+        surface.fresnelStrength = GetFresnel(i.uv_base);
         surface.dither = InterleavedGradientNoise(i.posCS.xy, 0);
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);
         surface.depth = -TransformWorldToView(i.posWS).z;

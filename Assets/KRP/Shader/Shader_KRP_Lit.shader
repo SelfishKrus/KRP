@@ -18,6 +18,7 @@ Shader "KRP/Lit"
         [Header(PBR ARGS)]
         _Metallic ("Metallic", Range(0.0, 1.0)) = 0.0
         _Smoothness ("Smoothness", Range(0.0, 1.0)) = 0.5
+        _Fresnel ("Fresnel", Range(0, 1)) = 1
 		[HDR] _EmissionColor("Emission", Color) = (0.0, 0.0, 0.0, 0.0)
         [NoScaleOffset] _EmissionMap("Emission", 2D) = "white" {}
         [Toggle(_PREMULTIPLY_ALPHA)] _PremultiplyAlpha ("Premultiply Alpha", Float) = 0

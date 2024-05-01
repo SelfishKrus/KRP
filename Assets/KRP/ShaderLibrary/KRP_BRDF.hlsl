@@ -1,12 +1,15 @@
 #ifndef KRP_BRDF_INCLUDED
 #define KRP_BRDF_INCLUDED
 
+	#include "KRP_Surface.hlsl"
+
 	struct BRDF
 	{
 		float3 diffuse;
 		float3 specular;
 		float roughness;
 		float perceptualRoughness;
+		float fresnel; // NoV 
 	};
 
 	#define DIELECTRIC_F0 0.04
@@ -73,12 +76,16 @@
 			brdf.diffuse *= surface.alpha;
 		#endif
 		brdf.specular = lerp(DIELECTRIC_F0, surface.color, surface.metallic);
+		//brdf.fresnel = Fresnel_SL(dot(surface.normal, surface.viewDirection), DIELECTRIC_F0, brdf.roughness);
+		//brdf.fresnel = Fresnel_Slk(DIELECTRIC_F0, dot(surface.normal, surface.viewDirection));
+		brdf.fresnel = saturate(surface.smoothness + 1.0 - oneMinusReflectivity);
 		return brdf;
 	}
 
 	float3 IndirectBRDF (Surface surface, BRDF brdf, float3 diffuse, float3 specular) 
 	{	
-		float3 reflection = specular * brdf.specular;
+		float fresnelStrength = surface.fresnelStrength * Pow4(1.0 - saturate(dot(surface.normal, surface.viewDirection)));
+		float3 reflection = specular * lerp(brdf.specular, brdf.fresnel, fresnelStrength);
 		reflection /= brdf.roughness * brdf.roughness + 1.0;
 		return diffuse * brdf.diffuse + reflection;
 	}

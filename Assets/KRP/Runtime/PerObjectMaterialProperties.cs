@@ -28,16 +28,16 @@ public class PerObjectMaterialProperties : MonoBehaviour
 
 	void OnValidate () 
     {
-		if (block == null) 
-        {
+		if (block == null)
+		{
 			block = new MaterialPropertyBlock();
 		}
 		block.SetColor(baseColorId, baseColor);
 		block.SetFloat(cutoffId, cutoff);
 		block.SetFloat(metallicId, metallic);
 		block.SetFloat(smoothnessId, smoothness);
-        block.SetColor(emissionColorId, emissionColor);
-        GetComponent<Renderer>().SetPropertyBlock(block);
+		block.SetColor(emissionColorId, emissionColor);
+		GetComponent<Renderer>().SetPropertyBlock(block);
 	}
 
 	void Awake () 

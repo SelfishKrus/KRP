@@ -63,6 +63,7 @@
         surface.color = baseCol.rgb;
         surface.alpha = baseCol.a;
         surface.metallic = GetMetallic(i.uv_base);
+        surface.occlusion = GetOcclusion(i.uv_base);
         surface.smoothness = GetSmoothness(i.uv_base);
         surface.fresnelStrength = GetFresnel(i.uv_base);
         surface.dither = InterleavedGradientNoise(i.posCS.xy, 0);

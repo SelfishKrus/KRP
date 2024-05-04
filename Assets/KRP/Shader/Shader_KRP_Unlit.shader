@@ -49,7 +49,7 @@ Shader "KRP/Unlit"
 
             struct Varyings
             {
-                float2 uv_base : VAR_UV;
+                float2 uv_base : VAR_UV_BASE;
                 float4 pos : SV_POSITION;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };

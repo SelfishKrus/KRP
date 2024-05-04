@@ -23,6 +23,11 @@ Shader "KRP/Lit"
         _Fresnel ("Fresnel", Range(0, 1)) = 1
 		[HDR] _EmissionColor("Emission", Color) = (0.0, 0.0, 0.0, 0.0)
         [NoScaleOffset] _EmissionMap("Emission", 2D) = "white" {}
+
+        _DetailMap("Details", 2D) = "linearGrey" {}
+        _DetailAlbedo("Detail Albedo", Range(0, 1)) = 1
+        _DetailSmoothness("Detail Smoothness", Range(0, 1)) = 1
+
         [Toggle(_PREMULTIPLY_ALPHA)] _PremultiplyAlpha ("Premultiply Alpha", Float) = 0
     }
     SubShader

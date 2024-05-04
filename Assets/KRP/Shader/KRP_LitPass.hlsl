@@ -24,7 +24,8 @@
     {
         float4 posCS : SV_POSITION;
         float3 posWS : VAR_POSITION;
-        float2 uv_base : VAR_UV;
+        float2 uv_base : VAR_UV_BASE;
+        float2 uv_detail : VAR_UV_DETAIL;
         float3 normalWS : VAR_NORMAL;
 
         GI_VARYINGS_DATA
@@ -39,6 +40,7 @@
         TRANSFER_GI_DATA(i, o);
 
         o.uv_base = TransformBaseUV(i.uv_base);
+        o.uv_detail = TransformDetailUV(i.uv_base);
         o.posWS = TransformObjectToWorld(i.posOS.xyz);
         o.posCS = TransformWorldToHClip(o.posWS.xyz);
         o.normalWS = TransformObjectToWorldNormal(i.normalOS);
@@ -51,7 +53,7 @@
 
         ClipLOD(i.posCS.xy, unity_LODFade.x);
 
-        half4 baseCol = GetBaseColor(i.uv_base);
+        half4 baseCol = GetBaseColor(i.uv_base, i.uv_detail);
 
         #ifdef _CLIPPING
             clip(baseCol.a - GetCutoff(i.uv_base));
@@ -64,7 +66,7 @@
         surface.alpha = baseCol.a;
         surface.metallic = GetMetallic(i.uv_base);
         surface.occlusion = GetOcclusion(i.uv_base);
-        surface.smoothness = GetSmoothness(i.uv_base);
+        surface.smoothness = GetSmoothness(i.uv_base, i.uv_detail);
         surface.fresnelStrength = GetFresnel(i.uv_base);
         surface.dither = InterleavedGradientNoise(i.posCS.xy, 0);
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);

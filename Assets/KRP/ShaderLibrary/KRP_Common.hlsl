@@ -2,6 +2,7 @@
 #define KRP_COMMON_INCLUDED
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl"
     #include "KRP_UnityInput.hlsl"
 
     #define UNITY_MATRIX_M unity_ObjectToWorld
@@ -36,6 +37,15 @@
 		    float dither = InterleavedGradientNoise(posCS.xy, 0);
             // take account of negated case
 		    clip(fade + (fade < 0.0 ? dither : -dither));
+	    #endif
+    }
+
+    float3 DecodeNormal (float4 sample, float scale) 
+    {
+	    #if defined(UNITY_NO_DXT5nm)
+	        return normalize(UnpackNormalRGB(sample, scale));
+	    #else
+	        return normalize(UnpackNormalmapRGorAG(sample, scale));
 	    #endif
     }
 

@@ -14,6 +14,7 @@
         float4 posOS : POSITION;
         float2 uv_base : TEXCOORD0;
         float3 normalOS : NORMAL;
+        float4 tangentOS : TANGENT;
 
         GI_ATTRIBUTE_DATA
         // Object index
@@ -27,6 +28,7 @@
         float2 uv_base : VAR_UV_BASE;
         float2 uv_detail : VAR_UV_DETAIL;
         float3 normalWS : VAR_NORMAL;
+        float4 tangentWS : VAR_TANGENT;
 
         GI_VARYINGS_DATA
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -44,6 +46,7 @@
         o.posWS = TransformObjectToWorld(i.posOS.xyz);
         o.posCS = TransformWorldToHClip(o.posWS.xyz);
         o.normalWS = TransformObjectToWorldNormal(i.normalOS);
+        o.tangentWS = float4(TransformObjectToWorldDir(i.tangentOS.xyz), i.tangentOS.w);
         return o;
     }
 
@@ -61,7 +64,8 @@
 
         Surface surface;
         surface.position = i.posWS;
-        surface.normal = normalize(i.normalWS);
+        surface.normal = NormalTangentToWorld(GetNormalTS(i.uv_base, i.uv_detail), i.normalWS, i.tangentWS);
+        surface.interpolatedNormal = i.normalWS;
         surface.color = baseCol.rgb;
         surface.alpha = baseCol.a;
         surface.metallic = GetMetallic(i.uv_base);

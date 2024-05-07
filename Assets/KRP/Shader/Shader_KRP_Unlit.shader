@@ -68,7 +68,8 @@ Shader "KRP/Unlit"
             {   
                 UNITY_SETUP_INSTANCE_ID(i);
 
-                half4 col = GetBaseColor(i.uv_base);
+                InputConfig config = GetInputConfig(i.uv_base);
+                half4 col = GetBaseColor(config);
 
                 #ifdef _CLIPPING
                     clip(col.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));

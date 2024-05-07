@@ -29,6 +29,24 @@
         UNITY_DEFINE_INSTANCED_PROP(float, _NormalScale)
     UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
+    struct InputConfig 
+    {
+	    float2 uv_base;
+	    float2 uv_detail;
+        bool useMask;
+        bool useDetail;
+    };
+
+    InputConfig GetInputConfig (float2 uv_base, float2 uv_detail = 0.0) 
+    {
+	    InputConfig c;
+	    c.uv_base = uv_base;
+	    c.uv_detail = uv_detail;
+        c.useMask = false;
+        c.useDetail = false;
+	    return c;
+    }
+
     float2 TransformBaseUV (float2 baseUV) 
     {
 	    float4 baseST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseMap_ST);
@@ -41,26 +59,38 @@
 	    return detailUV * detailST.xy + detailST.zw;
     }
 
-    float4 GetMask (float2 baseUV) 
-    {
-	    return SAMPLE_TEXTURE2D(_MaskMap, sampler_BaseMap, baseUV);
+    float4 GetMask (InputConfig c) 
+    {   
+        if (c.useMask)
+	        return SAMPLE_TEXTURE2D(_MaskMap, sampler_BaseMap, c.uv_base);
+        else 
+            return 1.0f;
     }
 
-    float4 GetDetail (float2 detailUV) 
-    {
-	    float4 map = SAMPLE_TEXTURE2D(_DetailMap, sampler_DetailMap, detailUV);
-	    return map * 2.0 - 1.0;
+    float4 GetDetail (InputConfig c) 
+    {   
+        if (c.useDetail)
+        {
+        	float4 map = SAMPLE_TEXTURE2D(_DetailMap, sampler_DetailMap, c.uv_detail);
+	        return map * 2.0 - 1.0;
+        }
+
+        return 0.0;
+
     }
 
-    float4 GetBaseColor (float2 baseUV, float2 detailUV = 0.0) 
+    float4 GetBaseColor (InputConfig c) 
     {
-	    float4 map = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, baseUV);
+	    float4 map = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, c.uv_base);
 	    float4 color = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
 
-        float detail = GetDetail(detailUV).r * UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DetailAlbedo);
-        float mask = GetMask(baseUV).b;
-        map.rgb = lerp(sqrt(map.rgb), detail < 0.0 ? 0.0 : 1.0, abs(detail) * mask);
-        map.rgb *= map.rgb;
+        if (c.useDetail) 
+        { 
+            float detail = GetDetail(c).r * UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DetailAlbedo);
+            float mask = GetMask(c).b;
+            map.rgb = lerp(sqrt(map.rgb), detail < 0.0 ? 0.0 : 1.0, abs(detail) * mask);
+            map.rgb *= map.rgb;
+        }
 
 	    return map * color;
     }
@@ -70,28 +100,31 @@
 	    return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff);
     }
 
-    float GetMetallic (float2 baseUV) 
+    float GetMetallic (InputConfig c) 
     {
 	    float metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Metallic);
-	    metallic *= GetMask(baseUV).r;
+	    metallic *= GetMask(c).r;
 	    return metallic;
     }
 
-    float GetSmoothness (float2 baseUV, float2 detailUV = 0.0) 
+    float GetSmoothness (InputConfig c) 
     {   
         float smoothness = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Smoothness);
-        smoothness *= GetMask(baseUV).a;
+        smoothness *= GetMask(c).a;
 
-        float detail = GetDetail(detailUV).b * UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DetailSmoothness);
-	    float mask = GetMask(baseUV).b;
-	    smoothness = lerp(smoothness, detail < 0.0 ? 0.0 : 1.0, abs(detail) * mask);
+        if (c.useDetail) 
+        { 
+            float detail = GetDetail(c).b * UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DetailSmoothness);
+	        float mask = GetMask(c).b;
+	        smoothness = lerp(smoothness, detail < 0.0 ? 0.0 : 1.0, abs(detail) * mask);
+        }
 
 	    return smoothness;
     }
 
-    float3 GetEmission (float2 baseUV)
+    float3 GetEmission (InputConfig c)
     {
-	    float4 map = SAMPLE_TEXTURE2D(_EmissionMap, sampler_BaseMap, baseUV);
+	    float4 map = SAMPLE_TEXTURE2D(_EmissionMap, sampler_BaseMap, c.uv_base);
 	    float4 color = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _EmissionColor);
 	    return map.rgb * color.rgb;
     }
@@ -101,24 +134,27 @@
 	    return UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Fresnel);
     }
 
-    float GetOcclusion (float2 baseUV) 
+    float GetOcclusion (InputConfig c) 
     {   
         float strength = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Occlusion);
-        float occlusion = GetMask(baseUV).g;
+        float occlusion = GetMask(c).g;
         occlusion = lerp(1.0f, occlusion, strength);
 	    return occlusion;
     }
 
-    float3 GetNormalTS (float2 baseUV, float2 detailUV = 0.0) 
+    float3 GetNormalTS (InputConfig c) 
     {
-	    float4 map = SAMPLE_TEXTURE2D(_NormalMap, sampler_BaseMap, baseUV);
+	    float4 map = SAMPLE_TEXTURE2D(_NormalMap, sampler_BaseMap, c.uv_base);
 	    float scale = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _NormalScale);
 	    float3 normal = DecodeNormal(map, scale);
 
-        map = SAMPLE_TEXTURE2D(_DetailNormalMap, sampler_DetailMap, detailUV);
-	    scale = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DetailNormalScale) * GetMask(baseUV).b;
-	    float3 detail = DecodeNormal(map, scale);
-	    normal = BlendNormalRNM(normal, detail);
+        if (c.useDetail) 
+        {
+            map = SAMPLE_TEXTURE2D(_DetailNormalMap, sampler_DetailMap, c.uv_detail);
+	        scale = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _DetailNormalScale) * GetMask(c).b;
+	        float3 detail = DecodeNormal(map, scale);
+	        normal = BlendNormalRNM(normal, detail);
+        }
 
 	    return normal;
     }

@@ -43,7 +43,8 @@
 
         ClipLOD(i.posCS.xy, unity_LODFade.x);
 
-        half4 baseCol = GetBaseColor(i.uv);
+        InputConfig config = GetInputConfig(i.uv);
+        half4 baseCol = GetBaseColor(config);
 
         #ifdef _SHADOWS_CLIP
             clip(baseCol.a - GetCutoff(i.uv));

@@ -38,13 +38,13 @@
 
 	float4 MetaPassFragment (Varyings i) : SV_TARGET 
 	{	
-
-		float4 baseColor = GetBaseColor(i.uv_base);
+		InputConfig config = GetInputConfig(i.uv_base); 
+		float4 baseColor = GetBaseColor(config);
 		Surface surface;
 		ZERO_INITIALIZE(Surface, surface);
 		surface.color = baseColor.rgb;
-		surface.metallic = GetMetallic(i.uv_base);
-		surface.smoothness = GetSmoothness(i.uv_base);
+		surface.metallic = GetMetallic(config);
+		surface.smoothness = GetSmoothness(config);
 
 		ShadowData shadowData = GetShadowData(surface);
 		Light light = GetDirectionalLight(0, surface, shadowData);
@@ -59,7 +59,7 @@
 		}
 		else if (unity_MetaFragmentControl.y) 
 		{
-			meta = float4(GetEmission(i.uv_base), 1.0);
+			meta = float4(GetEmission(config), 1.0);
 		}
 
 		return meta;

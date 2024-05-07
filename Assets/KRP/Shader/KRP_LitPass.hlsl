@@ -26,9 +26,13 @@
         float4 posCS : SV_POSITION;
         float3 posWS : VAR_POSITION;
         float2 uv_base : VAR_UV_BASE;
-        float2 uv_detail : VAR_UV_DETAIL;
+        #if defined(_DETAIL_MAP)
+            float2 uv_detail : VAR_UV_DETAIL;
+        #endif 
         float3 normalWS : VAR_NORMAL;
-        float4 tangentWS : VAR_TANGENT;
+        #if defined(_NORMAL_MAP)
+		    float4 tangentWS : VAR_TANGENT;
+	    #endif
 
         GI_VARYINGS_DATA
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -42,11 +46,15 @@
         TRANSFER_GI_DATA(i, o);
 
         o.uv_base = TransformBaseUV(i.uv_base);
-        o.uv_detail = TransformDetailUV(i.uv_base);
+        #if defined(_DETAIL_MAP)
+            o.uv_detail = TransformDetailUV(i.uv_base);
+        #endif 
         o.posWS = TransformObjectToWorld(i.posOS.xyz);
         o.posCS = TransformWorldToHClip(o.posWS.xyz);
         o.normalWS = TransformObjectToWorldNormal(i.normalOS);
-        o.tangentWS = float4(TransformObjectToWorldDir(i.tangentOS.xyz), i.tangentOS.w);
+        #if defined(_NORMAL_MAP)
+            o.tangentWS = float4(TransformObjectToWorldDir(i.tangentOS.xyz), i.tangentOS.w);
+        #endif
         return o;
     }
 
@@ -56,7 +64,16 @@
 
         ClipLOD(i.posCS.xy, unity_LODFade.x);
 
-        half4 baseCol = GetBaseColor(i.uv_base, i.uv_detail);
+        InputConfig config = GetInputConfig(i.uv_base);
+        #if defined(_MASK_MAP) 
+            config.useMask = true;
+        #endif 
+        #if defined(_DETAIL_MAP)
+            config.uv_detail = i.uv_detail;
+            config.useDetail = true;
+        #endif 
+
+        half4 baseCol = GetBaseColor(config);
 
         #ifdef _CLIPPING
             clip(baseCol.a - GetCutoff(i.uv_base));
@@ -64,13 +81,18 @@
 
         Surface surface;
         surface.position = i.posWS;
-        surface.normal = NormalTangentToWorld(GetNormalTS(i.uv_base, i.uv_detail), i.normalWS, i.tangentWS);
-        surface.interpolatedNormal = i.normalWS;
+        #if defined(_NORMAL_MAP)
+            surface.normal = NormalTangentToWorld(GetNormalTS(config), i.normalWS, i.tangentWS);
+            surface.interpolatedNormal = i.normalWS;
+        #else
+		    surface.normal = normalize(i.normalWS);
+		    surface.interpolatedNormal = surface.normal;
+	    #endif
         surface.color = baseCol.rgb;
         surface.alpha = baseCol.a;
-        surface.metallic = GetMetallic(i.uv_base);
-        surface.occlusion = GetOcclusion(i.uv_base);
-        surface.smoothness = GetSmoothness(i.uv_base, i.uv_detail);
+        surface.metallic = GetMetallic(config);
+        surface.occlusion = GetOcclusion(config);
+        surface.smoothness = GetSmoothness(config);
         surface.fresnelStrength = GetFresnel(i.uv_base);
         surface.dither = InterleavedGradientNoise(i.posCS.xy, 0);
         surface.viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.posWS);
@@ -79,7 +101,7 @@
         BRDF brdf = GetBRDF(surface);
         GI gi = GetGI(GI_FRAGMENT_DATA(i), surface, brdf);
         half3 col = GetLighting(surface, gi, brdf);
-        col += GetEmission(i.uv_base);
+        col += GetEmission(config);
 
         return half4(col, surface.alpha);
     }

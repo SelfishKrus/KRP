@@ -18,6 +18,7 @@
 	    float4 _OL_Positions[MAX_OTHER_LIGHT_COUNT];
         float4 _OL_Directions[MAX_OTHER_LIGHT_COUNT];
         float4 _OL_SpotAngles[MAX_OTHER_LIGHT_COUNT];
+        float4 _OL_ShadowData[MAX_OTHER_LIGHT_COUNT];
     CBUFFER_END
 
     struct Light 
@@ -54,6 +55,14 @@
     }
 
     // Other Light 
+    OtherShadowData GetOtherShadowData (int lightIndex) 
+    {
+	    OtherShadowData data;
+	    data.strength = _OL_ShadowData[lightIndex].x;
+	    data.shadowMaskChannel = _OL_ShadowData[lightIndex].w;
+	    return data; 
+    }
+
     Light GetOtherLight (int index, Surface surfaceWS, ShadowData shadowData) 
     {
 	    Light light;
@@ -65,10 +74,9 @@
         float distanceSqr = max(dot(ray, ray), 0.00001);
         float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _OL_Positions[index].w)));
         float4 spotAngles = _OL_SpotAngles[index];
-        float spotAttenuation = Square(
-		    saturate(dot(_OL_Directions[index].xyz, light.direction) *
-		    spotAngles.x + spotAngles.y));
-	    light.attenuation = spotAttenuation * rangeAttenuation / distanceSqr;
+        float spotAttenuation = Square(saturate(dot(_OL_Directions[index].xyz, light.direction) * spotAngles.x + spotAngles.y));
+        OtherShadowData otherShadowData = GetOtherShadowData(index);
+	    light.attenuation = GetOtherShadowAttenuation(otherShadowData, shadowData, surfaceWS) * spotAttenuation * rangeAttenuation / distanceSqr;
 
 	    return light;
     }

@@ -208,4 +208,29 @@
 		return shadow;
 	}
 
+	struct OtherShadowData 
+	{
+		float strength;
+		int shadowMaskChannel;
+	};
+
+	float GetOtherShadowAttenuation (OtherShadowData other, ShadowData global, Surface surfaceWS) 
+	{
+		#if !defined(_RECEIVE_SHADOWS)
+			return 1.0;
+		#endif
+	
+		float shadow;
+		if (other.strength > 0.0) 
+		{
+			shadow = GetBakedShadow(global.shadowMask, other.shadowMaskChannel, other.strength);
+		}
+		else 
+		{
+			shadow = 1.0;
+		}
+
+		return shadow;
+	}
+
 #endif 

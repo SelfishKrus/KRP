@@ -32,6 +32,7 @@
 		    Light light = GetOtherLight(j, surfaceWS, shadowData);
 		    color += GetLighting(surfaceWS, light, brdf);
 	    }
+
         return color;
     }
 

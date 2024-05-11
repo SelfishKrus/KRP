@@ -61,7 +61,8 @@
 	    light.direction = normalize(ray);
 
         float distanceSqr = max(dot(ray, ray), 0.00001);
-	    light.attenuation = 1.0 / distanceSqr;
+        float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _OL_Positions[index].w)));
+	    light.attenuation = rangeAttenuation / distanceSqr;
 
 	    return light;
     }

@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 namespace KRP
 {
 
-    public class KrusRenderPipeline : RenderPipeline
+    public partial class KrusRenderPipeline : RenderPipeline
     {
         bool useDynamicBatching, useGPUInstancing, useSRPBatcher;
         ShadowSettings shadowSettings;
@@ -21,6 +21,8 @@ namespace KRP
             this.shadowSettings = shadowSettings;
             GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
             GraphicsSettings.lightsUseLinearIntensity = true;
+
+            InitializeForEditor();
         }
 
         CameraRenderer renderer = new CameraRenderer();

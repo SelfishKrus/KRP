@@ -4,6 +4,7 @@
     #include "KRP_Shadows.hlsl"
 
     #define MAX_DIRECTIONAL_LIGHT_COUNT 4
+    #define MAX_OTHER_LIGHT_COUNT 64
 
     // _K_Light
     CBUFFER_START(KRP_Light)
@@ -11,6 +12,10 @@
         float3 _DL_Colors[MAX_DIRECTIONAL_LIGHT_COUNT];
         float3 _DL_Directions[MAX_DIRECTIONAL_LIGHT_COUNT];
         float4 _DL_ShadowData[MAX_DIRECTIONAL_LIGHT_COUNT];
+
+        int _OL_Count;
+	    float4 _OL_Colors[MAX_OTHER_LIGHT_COUNT];
+	    float4 _OL_Positions[MAX_OTHER_LIGHT_COUNT];
     CBUFFER_END
 
     struct Light 
@@ -46,6 +51,24 @@
         return _DL_Count;
     }
 
+    // Other Light 
+    Light GetOtherLight (int index, Surface surfaceWS, ShadowData shadowData) 
+    {
+	    Light light;
+	    light.color = _OL_Colors[index].rgb;
 
+	    float3 ray = _OL_Positions[index].xyz - surfaceWS.position;
+	    light.direction = normalize(ray);
+
+        float distanceSqr = max(dot(ray, ray), 0.00001);
+	    light.attenuation = 1.0 / distanceSqr;
+
+	    return light;
+    }
+
+    int GetOtherLightCount () 
+    {
+	    return _OL_Count;
+    }
 
 #endif

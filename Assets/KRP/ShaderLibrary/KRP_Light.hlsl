@@ -16,6 +16,8 @@
         int _OL_Count;
 	    float4 _OL_Colors[MAX_OTHER_LIGHT_COUNT];
 	    float4 _OL_Positions[MAX_OTHER_LIGHT_COUNT];
+        float4 _OL_Directions[MAX_OTHER_LIGHT_COUNT];
+        float4 _OL_SpotAngles[MAX_OTHER_LIGHT_COUNT];
     CBUFFER_END
 
     struct Light 
@@ -62,7 +64,11 @@
 
         float distanceSqr = max(dot(ray, ray), 0.00001);
         float rangeAttenuation = Square(saturate(1.0 - Square(distanceSqr * _OL_Positions[index].w)));
-	    light.attenuation = rangeAttenuation / distanceSqr;
+        float4 spotAngles = _OL_SpotAngles[index];
+        float spotAttenuation = Square(
+		    saturate(dot(_OL_Directions[index].xyz, light.direction) *
+		    spotAngles.x + spotAngles.y));
+	    light.attenuation = spotAttenuation * rangeAttenuation / distanceSqr;
 
 	    return light;
     }

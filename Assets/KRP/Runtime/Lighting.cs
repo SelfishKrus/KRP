@@ -33,11 +33,15 @@ namespace KRP
         static int
             otherLightCountId = Shader.PropertyToID("_OL_Count"),
             otherLightColorsId = Shader.PropertyToID("_OL_Colors"),
-            otherLightPositionsId = Shader.PropertyToID("_OL_Positions");
+            otherLightPositionsId = Shader.PropertyToID("_OL_Positions"),
+            otherLightDirectionsId = Shader.PropertyToID("_OL_Directions"),
+            otherLightSpotAnglesId = Shader.PropertyToID("_OL_SpotAngles");
 
         static Vector4[]
             otherLightColors = new Vector4[maxOtherLightCount],
-            otherLightPositions = new Vector4[maxOtherLightCount];
+            otherLightPositions = new Vector4[maxOtherLightCount],
+            otherLightDirections = new Vector4[maxOtherLightCount],
+            otherLightSpotAngles = new Vector4[maxOtherLightCount];
 
         Shadows shadows = new Shadows();
 
@@ -58,6 +62,24 @@ namespace KRP
             Vector4 position = visibleLight.localToWorldMatrix.GetColumn(3);
             position.w = 1f / Mathf.Max(visibleLight.range * visibleLight.range, 0.00001f);
             otherLightPositions[index] = position;
+            otherLightSpotAngles[index] = new Vector4(0f, 1f);
+        }
+
+        void SetupSpotLight(int index, ref VisibleLight visibleLight)
+        {
+            otherLightColors[index] = visibleLight.finalColor;
+            Vector4 position = visibleLight.localToWorldMatrix.GetColumn(3);
+            position.w =
+                1f / Mathf.Max(visibleLight.range * visibleLight.range, 0.00001f);
+            otherLightPositions[index] = position;
+            otherLightDirections[index] =
+                -visibleLight.localToWorldMatrix.GetColumn(2);
+
+            Light light = visibleLight.light;
+            float innerCos = Mathf.Cos(Mathf.Deg2Rad * 0.5f * light.innerSpotAngle);
+            float outerCos = Mathf.Cos(Mathf.Deg2Rad * 0.5f * visibleLight.spotAngle);
+            float angleRangeInv = 1f / Mathf.Max(innerCos - outerCos, 0.001f);
+            otherLightSpotAngles[index] = new Vector4(angleRangeInv, -outerCos * angleRangeInv);
         }
 
         void SetupLights()
@@ -82,6 +104,13 @@ namespace KRP
                             SetupPointLight(otherLightCount++, ref visibleLight);
                         }
                         break;
+
+                    case LightType.Spot:
+                        if (otherLightCount < maxOtherLightCount)
+                        {
+                            SetupSpotLight(otherLightCount++, ref visibleLight);
+                        }
+                        break;
                 }
             }
 
@@ -98,6 +127,8 @@ namespace KRP
             {
                 buffer.SetGlobalVectorArray(otherLightColorsId, otherLightColors);
                 buffer.SetGlobalVectorArray(otherLightPositionsId, otherLightPositions);
+                buffer.SetGlobalVectorArray(otherLightDirectionsId, otherLightDirections);
+                buffer.SetGlobalVectorArray(otherLightSpotAnglesId, otherLightSpotAngles);
             }
         }
 

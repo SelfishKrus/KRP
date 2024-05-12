@@ -7,6 +7,9 @@
 		float4 unity_LODFade;
 		float4 unity_WorldTransformParams;
 
+		real4 unity_LightData;	// y - num of lights
+		real4 unity_LightIndices[2];	// Each channel of the two vectors contains a light index,
+
 		float4 unity_ProbesOcclusion; // occlusion data for light probes
 
 		float4 unity_SpecCube0_HDR;

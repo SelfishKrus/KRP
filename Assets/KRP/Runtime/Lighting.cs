@@ -47,6 +47,8 @@ namespace KRP
 
         Shadows shadows = new Shadows();
 
+        static string lightsPerObjectKeyword = "_LIGHTS_PER_OBJECT";
+
         #endregion
 
         #region METHODS
@@ -87,12 +89,15 @@ namespace KRP
             otherLightShadowData[index] = shadows.ReserveOtherShadows(light, index);
         }
 
-        void SetupLights()
+        void SetupLights(bool useLightsPerObject)
         {
+            NativeArray<int> indexMap = useLightsPerObject ? cullingResults.GetLightIndexMap(Allocator.Temp) : default;
             NativeArray<VisibleLight> visibleLights = cullingResults.visibleLights;
             int dirLightCount = 0, otherLightCount = 0;
-            for (int i = 0; i < visibleLights.Length; i++)
+            int i;
+            for (i = 0; i < visibleLights.Length; i++)
             {
+                int newIndex = -1;
                 VisibleLight visibleLight = visibleLights[i];
                 switch (visibleLight.lightType)
                 {
@@ -106,6 +111,7 @@ namespace KRP
                     case LightType.Point:
                         if (otherLightCount < maxOtherLightCount)
                         {
+                            newIndex = otherLightCount;
                             SetupPointLight(otherLightCount++, ref visibleLight);
                         }
                         break;
@@ -113,10 +119,33 @@ namespace KRP
                     case LightType.Spot:
                         if (otherLightCount < maxOtherLightCount)
                         {
+                            newIndex = otherLightCount;
                             SetupSpotLight(otherLightCount++, ref visibleLight);
                         }
                         break;
                 }
+
+                if (useLightsPerObject)
+                {
+                    indexMap[i] = newIndex;
+                }
+            }
+
+            // to eliminate the indices of the invisible lights 
+            if (useLightsPerObject)
+            {
+                for (; i < indexMap.Length; i++)
+                {
+                    indexMap[i] = -1;
+                }
+
+                cullingResults.SetLightIndexMap(indexMap);
+                indexMap.Dispose();
+                Shader.EnableKeyword(lightsPerObjectKeyword);
+            }
+            else
+            {
+                Shader.DisableKeyword(lightsPerObjectKeyword);
             }
 
             buffer.SetGlobalInt(dirLightCountId, visibleLights.Length);
@@ -144,12 +173,12 @@ namespace KRP
         }
 
         // MAIN // 
-        public void Setup(ScriptableRenderContext context, CullingResults cullingResults, ShadowSettings shadowSettings)
+        public void Setup(ScriptableRenderContext context, CullingResults cullingResults, ShadowSettings shadowSettings, bool useLightsPerObject)
         {
             this.cullingResults = cullingResults;
             buffer.BeginSample(bufferName);
             shadows.Setup(context, cullingResults, shadowSettings);
-            SetupLights();
+            SetupLights(useLightsPerObject);
 
             shadows.Render();
             buffer.EndSample(bufferName);

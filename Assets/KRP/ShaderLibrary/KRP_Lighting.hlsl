@@ -27,11 +27,19 @@
             color += GetLighting(surfaceWS, light, brdf);
         }
 
-        for (int j = 0; j < GetOtherLightCount(); j++) 
+	#if defined(_LIGHTS_PER_OBJECT)
+		for (int j = 0; j < min(unity_LightData.y, 8); j++) 
         {
-		    Light light = GetOtherLight(j, surfaceWS, shadowData);
-		    color += GetLighting(surfaceWS, light, brdf);
-	    }
+			int lightIndex = unity_LightIndices[(uint)j / 4][(uint)j % 4];
+			Light light = GetOtherLight(lightIndex, surfaceWS, shadowData);
+			color += GetLighting(surfaceWS, light, brdf);
+		}
+	#else
+		for (int j = 0; j < GetOtherLightCount(); j++) {
+			Light light = GetOtherLight(j, surfaceWS, shadowData);
+			color += GetLighting(surfaceWS, light, brdf);
+		}
+	#endif
 
         return color;
     }

@@ -11,7 +11,11 @@ namespace KRP
     public class KrusRenderPipelineAsset : RenderPipelineAsset
     {
         [SerializeField]
-        bool useDynamicBatching = true, useGPUInstancing = true, useSRPBatcher = true;
+        bool 
+            useDynamicBatching = true, 
+            useGPUInstancing = true, 
+            useSRPBatcher = true, 
+            useLightsPerObject = true;
 
         [SerializeField]
         ShadowSettings shadows = default;
@@ -22,7 +26,7 @@ namespace KRP
 
         protected override RenderPipeline CreatePipeline()
         {
-            return new KrusRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher, shadows);
+            return new KrusRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher, useLightsPerObject, shadows);
         }
 
 

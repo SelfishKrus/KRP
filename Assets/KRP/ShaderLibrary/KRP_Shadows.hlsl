@@ -40,6 +40,7 @@
 		float4 _CascadeData[MAX_CASCADE_COUNT];
 		float4x4 _DirectionalShadowMatrices[MAX_SHADOWED_DIRECTIONAL_LIGHT_COUNT * MAX_CASCADE_COUNT];
 		float4x4 _OtherShadowMatrices[MAX_SHADOWED_OTHER_LIGHT_COUNT];
+		float4 _OtherShadowTiles[MAX_SHADOWED_OTHER_LIGHT_COUNT];
 		float4 _ShadowAtlasSize;
 		float4 _ShadowDistanceFade;
 	CBUFFER_END
@@ -251,11 +252,16 @@
 		float strength;
 		int tileIndex;
 		int shadowMaskChannel;
+		float3 lightPosWS;
+		float3 spotDirWS;
 	};
 
 	float GetOtherShadow (OtherShadowData other, ShadowData global, Surface surfaceWS) 
-	{
-		float3 normalBias = surfaceWS.interpolatedNormal * 0.0;
+	{	
+		float4 tileData = _OtherShadowTiles[other.tileIndex];
+		float3 surfaceToLight = other.lightPosWS - surfaceWS.position;
+		float distanceToLightPlane = dot(surfaceToLight, other.spotDirWS);
+		float3 normalBias = surfaceWS.interpolatedNormal * (distanceToLightPlane * tileData.w);
 		float4 posSTS = mul(
 			_OtherShadowMatrices[other.tileIndex],
 			float4(surfaceWS.position + normalBias, 1.0)

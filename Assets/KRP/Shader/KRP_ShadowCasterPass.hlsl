@@ -17,6 +17,8 @@
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
+    bool _ShadowPancaking;
+
     Varyings ShadowCasterPassVertex (Attributes i)
     {   
         Varyings o;
@@ -25,6 +27,8 @@
         float3 posWS = TransformObjectToWorld(i.posOS.xyz);
         o.posCS = TransformWorldToHClip(posWS.xyz);
 
+        if (_ShadowPancaking)
+        { 
         #if UNITY_REVERSED_Z
 		    o.posCS.z =
 			    min(o.posCS.z, o.posCS.w * UNITY_NEAR_CLIP_VALUE);
@@ -32,6 +36,7 @@
 		    output.posCS.z =
 			    max(o.posCS.z, o.posCS.w * UNITY_NEAR_CLIP_VALUE);
 	    #endif
+        }
 
         o.uv = TransformBaseUV(i.uv);
         return o;

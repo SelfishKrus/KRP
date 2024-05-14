@@ -59,6 +59,7 @@
     {
 	    OtherShadowData data;
 	    data.strength = _OL_ShadowData[lightIndex].x;
+        data.tileIndex = _OL_ShadowData[lightIndex].y;
 	    data.shadowMaskChannel = _OL_ShadowData[lightIndex].w;
 	    return data; 
     }

@@ -61,7 +61,9 @@
 	    data.strength = _OL_ShadowData[lightIndex].x;
         data.tileIndex = _OL_ShadowData[lightIndex].y;
 	    data.shadowMaskChannel = _OL_ShadowData[lightIndex].w;
+        data.isPoint = _OL_ShadowData[lightIndex].z == 1.0;
         data.lightPosWS = 0.0;
+        data.lightDirWS = 0.0;
         data.spotDirWS = 0.0;
 	    return data; 
     }
@@ -82,6 +84,7 @@
         float spotAttenuation = Square(saturate(dot(spotDir, light.direction) * spotAngles.x + spotAngles.y));
         OtherShadowData otherShadowData = GetOtherShadowData(index);
         otherShadowData.lightPosWS = pos;
+        otherShadowData.lightDirWS = light.direction;
 	    otherShadowData.spotDirWS = spotDir;
 	    light.attenuation = GetOtherShadowAttenuation(otherShadowData, shadowData, surfaceWS) * spotAttenuation * rangeAttenuation / distanceSqr;
 

@@ -13,11 +13,17 @@ https://sleepy-badge-984.notion.site/SRP-2a71bcbdddeb46feaed4678ccd761ef4?pvs=4
 - Lighting
   - [x] KRP Lit Shader
   - [x] Directional Light
-  - [ ] Point Light
-  - [ ] Light map
+  - [x] Point Light
+  - [x] Light map
+  - [x] Reflection Probe 
 - Shadows
   - [x] Cascade Shadows
   - [x] Clip and Dither Shadow
   - [x] PCSS
+  - [x] Shadow mask 
+  - [x] Point and Spot Light Shadow
+- MISC
+  - [x] LoD
+  - [x] Complex Map 
 - Post-process
 - Anti-Aliasing
